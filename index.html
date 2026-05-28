@@ -2,2947 +2,420 @@
 <html lang="kk">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-<meta name="description" content="«Аян» ЕСО — Емхана басқару порталы">
-<title>«Аян» ЕСО · Басқару порталы</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/pdfmake.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/vfs_fonts.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<!-- Leaflet — карта кітапханасы -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-
-<script src="https://cdn.jsdelivr.net/npm/pdfmake@0.2.10/build/pdfmake.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/pdfmake@0.2.10/build/vfs_fonts.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Аян ЕСО — Халық санағы</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Spectral:wght@600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #f4f1ea;
-    --bg-card: #ffffff;
-    --bg-card-2: #fbf9f4;
-    --ink: #1a1d1a;
-    --ink-2: #4a4d48;
-    --ink-3: #8a8d88;
-    --accent: #2d5e3e;
-    --accent-2: #c8a951;
-    --danger: #b8392c;
-    --warn: #c87b1f;
-    --ok: #2d5e3e;
-    --line: #e3dfd5;
-    --shadow: 0 1px 2px rgba(26,29,26,.04), 0 4px 16px rgba(26,29,26,.06);
-    --radius: 14px;
-    --radius-sm: 8px;
+    --bg: #0d1f1a;
+    --bg-soft: #14302a;
+    --card: #1a3d35;
+    --card-hover: #21483f;
+    --accent: #2dd4a7;
+    --accent-soft: #1a8a6f;
+    --gold: #d4a843;
+    --text: #e8f5f0;
+    --text-dim: #8fb3a8;
+    --danger: #ef7676;
+    --warn: #e8b44a;
+    --border: rgba(45, 212, 167, 0.15);
   }
-  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
   body {
-    background: var(--bg); color: var(--ink);
-    font-family: 'Georgia', 'Times New Roman', serif;
-    font-size: 15px; line-height: 1.5; min-height: 100vh;
-    background-image:
-      radial-gradient(circle at 10% 0%, rgba(45,94,62,.04) 0%, transparent 40%),
-      radial-gradient(circle at 90% 100%, rgba(200,169,81,.05) 0%, transparent 40%);
+    font-family: 'Manrope', sans-serif;
+    background:
+      radial-gradient(ellipse at top left, rgba(45,212,167,0.08), transparent 50%),
+      radial-gradient(ellipse at bottom right, rgba(212,168,67,0.06), transparent 50%),
+      var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 32px 20px;
+    -webkit-font-smoothing: antialiased;
   }
 
-  /* === LOGIN === */
-  .login-wrap { position: fixed; inset: 0; background: linear-gradient(135deg, #1a3a26 0%, #2d5e3e 50%, #1a3a26 100%); display: grid; place-items: center; z-index: 1000; padding: 20px; }
-  .login-wrap.hidden { display: none; }
-  .login-box { background: var(--bg-card); border-radius: var(--radius); padding: 32px 28px; width: 100%; max-width: 380px; box-shadow: 0 24px 64px rgba(0,0,0,.3); }
-  .login-logo { width: 64px; height: 64px; background: var(--accent); color: #fff; border-radius: 16px; display: grid; place-items: center; font-weight: 700; font-size: 32px; margin: 0 auto 20px; letter-spacing: -2px; }
-  .login-title { text-align: center; font-size: 22px; font-weight: 600; margin-bottom: 4px; }
-  .login-sub { text-align: center; font-family: -apple-system, sans-serif; font-size: 13px; color: var(--ink-3); margin-bottom: 24px; }
-  .login-input { width: 100%; padding: 13px 16px; border: 1.5px solid var(--line); border-radius: 10px; font-family: -apple-system, sans-serif; font-size: 15px; margin-bottom: 12px; background: var(--bg-card-2); -webkit-appearance: none; }
-  .login-input:focus { outline: none; border-color: var(--accent); background: #fff; }
-  .login-btn { width: 100%; padding: 13px; background: var(--accent); color: #fff; border: none; border-radius: 10px; font-family: -apple-system, sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 6px; }
-  .login-btn:hover { background: #234a31; }
-  .login-error { background: #fdf0ee; color: var(--danger); padding: 10px 14px; border-radius: 8px; font-family: -apple-system, sans-serif; font-size: 12px; margin-bottom: 12px; display: none; }
-  .login-error.show { display: block; }
-  .login-hint { font-family: -apple-system, sans-serif; font-size: 11px; color: var(--ink-3); text-align: center; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--line); }
+  .container { max-width: 1000px; margin: 0 auto; }
 
-  /* === HEADER === */
-  .topbar { position: sticky; top: 0; z-index: 100; background: rgba(244,241,234,.92); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); }
-  .topbar-inner { max-width: 1200px; margin: 0 auto; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-  .brand { display: flex; align-items: center; gap: 10px; }
-  .brand-mark { width: 36px; height: 36px; background: var(--accent); color: #fff; border-radius: 8px; display: grid; place-items: center; font-weight: 700; font-size: 18px; letter-spacing: -1px; }
-  .brand-text strong { font-size: 15px; display: block; }
-  .brand-text small { font-size: 10px; color: var(--ink-3); letter-spacing: .8px; text-transform: uppercase; }
-  .top-actions { display: flex; gap: 6px; }
-  .icon-btn { background: none; border: 1px solid var(--line); border-radius: 8px; padding: 7px 12px; cursor: pointer; font-family: -apple-system, sans-serif; font-size: 12px; color: var(--ink-2); }
-  .icon-btn:hover { border-color: var(--accent); color: var(--accent); }
-  .icon-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
-  .icon-btn.primary:hover { background: #234a31; }
-
-  /* === TABS === */
-  .tabs { background: var(--bg-card); border-bottom: 1px solid var(--line); overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
-  .tabs::-webkit-scrollbar { display: none; }
-  .tabs-inner { max-width: 1200px; margin: 0 auto; display: flex; padding: 0 8px; min-width: max-content; }
-  .tab { background: none; border: none; cursor: pointer; padding: 14px 14px; font-family: -apple-system, sans-serif; font-size: 13px; font-weight: 500; color: var(--ink-2); white-space: nowrap; border-bottom: 2px solid transparent; }
-  .tab:hover { color: var(--accent); }
-  .tab.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
-
-  main { max-width: 1200px; margin: 0 auto; padding: 20px 16px 60px; }
-  .section { display: none; }
-  .section.active { display: block; animation: fadeIn .3s ease; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; } }
-  .section-head { margin-bottom: 18px; }
-  .section-title { font-size: 26px; font-weight: 600; letter-spacing: -.5px; line-height: 1.15; }
-  .section-sub { font-family: -apple-system, sans-serif; font-size: 13px; color: var(--ink-3); margin-top: 4px; }
-
-  .card { background: var(--bg-card); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; box-shadow: var(--shadow); margin-bottom: 14px; }
-  .card-title { font-family: -apple-system, sans-serif; font-size: 12px; font-weight: 600; color: var(--ink-3); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 12px; }
-
-  .kpi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px; }
-  @media (min-width: 700px) { .kpi-grid { grid-template-columns: repeat(4, 1fr); gap: 14px; } }
-  .kpi { background: var(--bg-card); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px; box-shadow: var(--shadow); position: relative; overflow: hidden; }
-  .kpi::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--accent); }
-  .kpi.danger::before { background: var(--danger); }
-  .kpi.warn::before { background: var(--warn); }
-  .kpi.ok::before { background: var(--ok); }
-  .kpi-label { font-family: -apple-system, sans-serif; font-size: 11px; color: var(--ink-3); text-transform: uppercase; letter-spacing: .6px; margin-bottom: 6px; line-height: 1.3; }
-  .kpi-value { font-size: 22px; font-weight: 600; letter-spacing: -.5px; line-height: 1.1; }
-  @media (min-width: 700px) { .kpi-value { font-size: 26px; } }
-  .kpi-extra { font-family: -apple-system, sans-serif; font-size: 11px; color: var(--ink-3); margin-top: 4px; }
-  .kpi-extra.danger { color: var(--danger); font-weight: 600; }
-  .kpi-extra.ok { color: var(--ok); font-weight: 600; }
-
-  .alert { background: linear-gradient(180deg, #fdf4f2, #fbe9e6); border: 1px solid #e8c0b8; border-left: 4px solid var(--danger); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 18px; display: flex; gap: 12px; }
-  .alert-icon { font-size: 24px; flex-shrink: 0; }
-  .alert-title { font-weight: 700; color: var(--danger); font-size: 14px; margin-bottom: 4px; }
-  .alert-text { font-family: -apple-system, sans-serif; font-size: 13px; line-height: 1.45; color: #5a221c; }
-  .alert.warn { background: linear-gradient(180deg, #fdf6ec, #fbecd5); border-color: #e8c789; border-left-color: var(--warn); }
-  .alert.warn .alert-title { color: var(--warn); }
-  .alert.warn .alert-text { color: #5a3e15; }
-  .alert.ok { background: linear-gradient(180deg, #f0f5ec, #e8f0e2); border-color: #c8d8b8; border-left-color: var(--accent); }
-  .alert.ok .alert-title { color: var(--accent); }
-  .alert.ok .alert-text { color: #2a3e25; }
-
-  .chart-box { position: relative; height: 240px; margin-top: 8px; }
-  @media (min-width: 700px) { .chart-box { height: 300px; } }
-
-  .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: var(--radius-sm); }
-  table { width: 100%; border-collapse: collapse; font-family: -apple-system, sans-serif; font-size: 13px; min-width: 480px; }
-  thead th { text-align: left; font-weight: 600; color: var(--ink-3); text-transform: uppercase; letter-spacing: .5px; font-size: 11px; padding: 10px 12px; border-bottom: 1px solid var(--line); background: var(--bg-card-2); }
-  thead th.num { text-align: right; }
-  tbody td { padding: 11px 12px; border-bottom: 1px solid var(--line); }
-  tbody td.num { text-align: right; font-variant-numeric: tabular-nums; }
-  tbody tr:hover { background: var(--bg-card-2); }
-  tbody tr:last-child td { border-bottom: none; }
-
-  .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; background: rgba(45,94,62,.1); color: var(--accent); }
-  .badge.danger { background: rgba(184,57,44,.1); color: var(--danger); }
-  .badge.warn { background: rgba(200,123,31,.12); color: var(--warn); }
-
-  .progress-row { margin-bottom: 14px; }
-  .progress-row:last-child { margin-bottom: 0; }
-  .progress-head { display: flex; justify-content: space-between; gap: 8px; font-family: -apple-system, sans-serif; font-size: 13px; margin-bottom: 6px; }
-  .progress-label { color: var(--ink-2); font-weight: 500; flex: 1; }
-  .progress-val { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; flex-shrink: 0; }
-  .progress-bar { height: 8px; background: var(--line); border-radius: 4px; overflow: hidden; }
-  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-2)); border-radius: 4px; transition: width 1s; }
-  .progress-fill.danger { background: linear-gradient(90deg, var(--danger), #e07060); }
-  .progress-fill.warn { background: linear-gradient(90deg, var(--warn), #e0a560); }
-  .progress-extra { font-family: -apple-system, sans-serif; font-size: 11px; color: var(--ink-3); margin-top: 4px; }
-
-  .list-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
-  .list-item:last-child { border-bottom: none; }
-  .list-num { width: 26px; height: 26px; border-radius: 50%; background: var(--bg-card-2); color: var(--ink-2); display: grid; place-items: center; font-family: -apple-system, sans-serif; font-size: 12px; font-weight: 600; flex-shrink: 0; }
-  .list-num.top { background: var(--accent); color: #fff; }
-  .list-content { flex: 1; min-width: 0; }
-  .list-text { font-size: 14px; margin-bottom: 3px; line-height: 1.35; }
-  .list-meta { font-family: -apple-system, sans-serif; font-size: 12px; color: var(--ink-3); }
-  .list-val { font-family: -apple-system, sans-serif; font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; flex-shrink: 0; margin-left: 8px; }
-
-  .rec { background: linear-gradient(180deg, #f0f5ec, #e8f0e2); border: 1px solid #c8d8b8; border-left: 4px solid var(--accent); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 12px; }
-  .rec-title { font-weight: 700; color: var(--accent); font-size: 14px; margin-bottom: 6px; }
-  .rec-text { font-family: -apple-system, sans-serif; font-size: 13px; line-height: 1.5; color: var(--ink-2); }
-  .rec-text strong { color: var(--ink); }
-  .rec-law { display: inline-block; margin-top: 8px; padding: 4px 10px; background: rgba(45,94,62,.1); color: var(--accent); border-radius: 6px; font-family: -apple-system, sans-serif; font-size: 11px; font-weight: 600; }
-
-  /* === УЧАСКЕ === */
-  .uch-selector { display: flex; gap: 6px; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 8px; margin-bottom: 16px; scrollbar-width: none; }
-  .uch-selector::-webkit-scrollbar { display: none; }
-  .uch-pill { background: var(--bg-card); border: 1.5px solid var(--line); color: var(--ink-2); padding: 8px 16px; border-radius: 24px; font-family: -apple-system, sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: all .2s; }
-  .uch-pill:hover { border-color: var(--accent); color: var(--accent); }
-  .uch-pill.active { background: var(--accent); color: #fff; border-color: var(--accent); }
-
-  /* === АПТАЛЫҚ МОНИТОРИНГ === */
-  .monitor-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
-  @media (min-width: 700px) { .monitor-grid { grid-template-columns: 1fr 1fr; } }
-  .monitor-card { background: var(--bg-card); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow); }
-  .monitor-title { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-  .monitor-title strong { font-size: 16px; font-weight: 600; }
-  .monitor-status { padding: 4px 10px; border-radius: 12px; font-family: -apple-system, sans-serif; font-size: 11px; font-weight: 600; }
-  .monitor-status.ok { background: rgba(45,94,62,.1); color: var(--accent); }
-  .monitor-status.warn { background: rgba(200,123,31,.12); color: var(--warn); }
-  .monitor-status.danger { background: rgba(184,57,44,.1); color: var(--danger); }
-  .monitor-body { font-family: -apple-system, sans-serif; font-size: 12px; color: var(--ink-2); line-height: 1.5; }
-  .monitor-body strong { color: var(--ink); font-weight: 600; }
-  .mini-chart { height: 60px; margin-top: 10px; position: relative; }
-
-  /* === ЖАЛАҚЫ КАЛЬКУЛЯТОР === */
-  .salary-controls {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 12px;
-    margin-bottom: 16px;
-  }
-  @media (min-width: 700px) { .salary-controls { grid-template-columns: 2fr 1fr 1fr; } }
-  .form-group { display: flex; flex-direction: column; gap: 6px; }
-  .form-label {
-    font-family: -apple-system, sans-serif;
-    font-size: 11px; font-weight: 600;
-    color: var(--ink-3); text-transform: uppercase; letter-spacing: .6px;
-  }
-  .form-select, .form-input {
-    padding: 10px 12px;
-    border: 1.5px solid var(--line);
-    border-radius: 8px;
-    font-family: -apple-system, sans-serif;
-    font-size: 14px;
-    background: var(--bg-card);
-    -webkit-appearance: none;
-    color: var(--ink);
-  }
-  .form-select:focus, .form-input:focus { outline: none; border-color: var(--accent); }
-  .form-input.num { font-variant-numeric: tabular-nums; }
-  .checkbox-group { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
-  .checkbox-pill {
-    display: inline-flex; align-items: center; gap: 6px;
-    padding: 7px 12px;
-    background: var(--bg-card-2);
-    border: 1.5px solid var(--line);
-    border-radius: 20px;
-    cursor: pointer;
-    font-family: -apple-system, sans-serif;
-    font-size: 12px;
-    color: var(--ink-2);
-    transition: all .15s;
-    user-select: none;
-  }
-  .checkbox-pill input { display: none; }
-  .checkbox-pill:hover { border-color: var(--accent); }
-  .checkbox-pill.active {
-    background: rgba(45,94,62,.1);
-    color: var(--accent);
-    border-color: var(--accent);
-    font-weight: 600;
-  }
-  .salary-result {
-    background: linear-gradient(180deg, #f0f5ec, #e8f0e2);
-    border: 1px solid #c8d8b8;
-    border-radius: var(--radius);
-    padding: 18px;
-    margin-top: 14px;
-  }
-  .salary-row {
-    display: flex; justify-content: space-between; align-items: baseline;
-    padding: 8px 0;
-    border-bottom: 1px dashed rgba(45,94,62,.2);
-    font-family: -apple-system, sans-serif;
-    font-size: 13px;
-  }
-  .salary-row:last-of-type { border-bottom: none; }
-  .salary-row.total {
-    border-top: 2px solid var(--accent);
-    border-bottom: none;
-    padding-top: 14px;
-    margin-top: 8px;
-    font-size: 16px;
-    font-weight: 700;
-  }
-  .salary-row .label { color: var(--ink-2); flex: 1; }
-  .salary-row .value { font-variant-numeric: tabular-nums; font-weight: 600; color: var(--ink); }
-  .salary-row.total .value { color: var(--accent); font-size: 22px; }
-  .salary-row .desc {
-    font-size: 11px; color: var(--ink-3);
-    margin-left: 8px;
-  }
-  .formula-box {
-    background: var(--bg-card-2);
-    border: 1px solid var(--line);
-    border-radius: var(--radius-sm);
-    padding: 12px 14px;
-    font-family: 'SF Mono', Menlo, monospace;
-    font-size: 12px;
-    color: var(--ink-2);
-    line-height: 1.6;
-    margin-top: 10px;
-  }
-  .formula-box strong { color: var(--accent); font-weight: 700; }
-  .formula-box em { color: var(--ink-3); font-style: italic; }
-
-  /* === ТОЛЫҚ САЛҚ ЕСЕБІ — НӘТИЖЕ === */
-  .salary-result-card {
-    background: var(--bg-card);
-    border: 2px solid var(--accent);
-    border-radius: var(--radius);
-    padding: 0;
-    margin-bottom: 14px;
-    box-shadow: 0 8px 24px rgba(45,94,62,.12);
-    overflow: hidden;
-  }
-  .sal-header {
-    background: linear-gradient(135deg, var(--accent), #4a7558);
-    color: #fff;
-    padding: 18px 20px;
+  /* Header */
+  .header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     flex-wrap: wrap;
-    gap: 12px;
+    gap: 16px;
+    margin-bottom: 36px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
   }
-  .sal-header-info { flex: 1; min-width: 200px; }
-  .sal-header-title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
-  .sal-header-sub { font-family: -apple-system, sans-serif; font-size: 12px; opacity: .85; }
-  .sal-pdf-btn {
-    background: #fff;
-    color: var(--accent);
-    border: none;
-    padding: 10px 18px;
-    border-radius: 8px;
-    font-family: -apple-system, sans-serif;
+
+  .header-left { display: flex; align-items: center; gap: 16px; }
+
+  .logo {
+    width: 52px; height: 52px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-soft));
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px;
+    box-shadow: 0 8px 24px rgba(45,212,167,0.25);
+  }
+
+  .title-group h1 {
+    font-family: 'Spectral', serif;
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+  }
+
+  .title-group p {
+    color: var(--text-dim);
     font-size: 13px;
-    font-weight: 600;
+    margin-top: 2px;
+  }
+
+  .updated {
+    font-size: 12px;
+    color: var(--text-dim);
+    text-align: right;
+  }
+  .updated span { color: var(--accent); font-weight: 600; }
+
+  /* Section label */
+  .section-label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--text-dim);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* Grid */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .card {
+    background: linear-gradient(160deg, var(--card), var(--bg-soft));
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 24px 20px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.25s ease, border-color 0.25s ease;
+    opacity: 0;
+    transform: translateY(16px);
+    animation: rise 0.5s ease forwards;
+  }
+
+  .card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(45,212,167,0.4);
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 3px;
+    background: var(--accent);
+    opacity: 0.6;
+  }
+
+  .card.danger::before { background: var(--danger); }
+  .card.warn::before { background: var(--warn); }
+  .card.gold::before { background: var(--gold); }
+
+  .card-icon { font-size: 28px; margin-bottom: 12px; display: block; }
+
+  .card-value {
+    font-size: 42px;
+    font-weight: 800;
+    line-height: 1;
+    font-family: 'Spectral', serif;
+  }
+
+  .card.danger .card-value { color: var(--danger); }
+  .card.warn .card-value { color: var(--warn); }
+  .card.gold .card-value { color: var(--gold); }
+  .card.accent .card-value { color: var(--accent); }
+
+  .card-label {
+    font-size: 13px;
+    color: var(--text-dim);
+    margin-top: 8px;
+    font-weight: 500;
+  }
+
+  @keyframes rise {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Refresh button */
+  .actions { display: flex; justify-content: center; margin-top: 8px; }
+
+  .btn {
+    background: linear-gradient(135deg, var(--accent), var(--accent-soft));
+    color: var(--bg);
+    border: none;
+    padding: 14px 32px;
+    border-radius: 12px;
+    font-family: 'Manrope', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    transition: all .2s;
+    gap: 10px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 6px 20px rgba(45,212,167,0.25);
   }
-  .sal-pdf-btn:hover { background: var(--bg-card-2); transform: translateY(-1px); }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(45,212,167,0.35); }
+  .btn:active { transform: translateY(0); }
+  .btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
-  .sal-section { padding: 14px 20px; border-bottom: 1px solid var(--line); }
-  .sal-section:last-child { border-bottom: none; }
-  .sal-section-title {
-    font-family: -apple-system, sans-serif;
-    font-size: 11px; font-weight: 600;
-    color: var(--ink-3); text-transform: uppercase; letter-spacing: .8px;
-    margin-bottom: 10px;
-  }
-  .sal-line {
-    display: flex; justify-content: space-between; align-items: baseline;
-    padding: 6px 0;
-    font-family: -apple-system, sans-serif;
-    font-size: 13px;
-  }
-  .sal-line .label { color: var(--ink-2); flex: 1; padding-right: 12px; }
-  .sal-line .label .desc { display: block; font-size: 11px; color: var(--ink-3); margin-top: 2px; }
-  .sal-line .value { font-variant-numeric: tabular-nums; font-weight: 600; color: var(--ink); white-space: nowrap; }
-  .sal-line.subtotal {
-    border-top: 1px solid var(--line);
-    padding-top: 10px;
-    margin-top: 4px;
-    font-weight: 700;
-  }
-  .sal-line.minus .value { color: var(--danger); }
-  .sal-line.plus .value { color: var(--accent); }
+  .btn.spinning .btn-icon { animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
 
-  .sal-final {
-    background: linear-gradient(180deg, #f0f5ec, #e8f0e2);
-    padding: 18px 20px;
+  /* States */
+  .state {
     text-align: center;
+    padding: 60px 20px;
+    color: var(--text-dim);
   }
-  .sal-final-label {
-    font-family: -apple-system, sans-serif;
-    font-size: 13px; color: var(--ink-2);
-    margin-bottom: 6px;
-    text-transform: uppercase; letter-spacing: .8px; font-weight: 600;
-  }
-  .sal-final-value {
-    font-size: 36px;
-    font-weight: 700;
-    color: var(--accent);
-    letter-spacing: -1px;
-    font-variant-numeric: tabular-nums;
-    line-height: 1.1;
-  }
-  @media (min-width: 700px) { .sal-final-value { font-size: 44px; } }
-  .sal-final-extra {
-    font-family: -apple-system, sans-serif;
-    font-size: 12px; color: var(--ink-3);
-    margin-top: 8px;
-  }
+  .state-icon { font-size: 48px; margin-bottom: 16px; }
+  .state.error .state-icon { color: var(--danger); }
 
-  .sal-employer-box {
-    background: var(--bg-card-2);
-    padding: 14px 20px;
-    border-top: 2px dashed var(--line);
-  }
-  .sal-employer-box .sal-section-title { color: var(--warn); }
+  .hidden { display: none !important; }
 
-  .doplata-pill {
-    display: flex; align-items: center; gap: 8px;
-    padding: 9px 14px;
-    background: var(--bg-card-2);
-    border: 1.5px solid var(--line);
-    border-radius: 24px;
-    cursor: pointer;
-    font-family: -apple-system, sans-serif;
+  /* Footer */
+  .footer {
+    text-align: center;
+    margin-top: 40px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    color: var(--text-dim);
     font-size: 12px;
-    color: var(--ink-2);
-    user-select: none;
-    transition: all .15s;
-  }
-  .doplata-pill:hover { border-color: var(--accent); }
-  .doplata-pill input { display: none; }
-  .doplata-pill.active { background: rgba(45,94,62,.1); color: var(--accent); border-color: var(--accent); font-weight: 600; }
-  .doplata-pill .pill-pct {
-    background: rgba(45,94,62,.15);
-    color: var(--accent);
-    padding: 2px 7px;
-    border-radius: 8px;
-    font-size: 10px;
-    font-weight: 700;
-  }
-  .doplata-pill.active .pill-pct { background: var(--accent); color: #fff; }
-
-
-  /* === ХАЛЫҚ САНАҒЫ === */
-  .census-tabs {
-    display: flex; gap: 4px;
-    background: var(--bg-card-2);
-    padding: 4px;
-    border-radius: 12px;
-    margin-bottom: 14px;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-  .census-tab {
-    flex: 1; min-width: max-content;
-    padding: 8px 14px;
-    background: none;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-family: -apple-system, sans-serif;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--ink-2);
-    white-space: nowrap;
-    transition: all .2s;
-  }
-  .census-tab.active { background: var(--accent); color: #fff; }
-  .census-section { display: none; }
-  .census-section.active { display: block; }
-
-  .census-form {
-    background: var(--bg-card);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    padding: 16px;
-    margin-bottom: 14px;
-  }
-  .census-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
-  @media (min-width: 700px) { .census-grid { grid-template-columns: 1fr 1fr; } }
-  @media (min-width: 1000px) { .census-grid { grid-template-columns: 1fr 1fr 1fr; } }
-
-  .census-card {
-    background: var(--bg-card);
-    border: 1px solid var(--line);
-    border-radius: var(--radius-sm);
-    padding: 14px;
-    margin-bottom: 10px;
-    box-shadow: var(--shadow);
-    transition: all .2s;
-  }
-  .census-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,.08); border-color: var(--accent); }
-  .census-card-row {
-    display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;
-  }
-  .census-card-info { flex: 1; min-width: 0; }
-  .census-card-title { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
-  .census-card-meta {
-    font-family: -apple-system, sans-serif;
-    font-size: 11px; color: var(--ink-3);
-    line-height: 1.5;
-  }
-  .census-card-actions { display: flex; gap: 6px; flex-shrink: 0; }
-  .census-mini-btn {
-    background: var(--bg-card-2);
-    border: 1px solid var(--line);
-    border-radius: 6px;
-    padding: 5px 10px;
-    cursor: pointer;
-    font-size: 11px;
-    color: var(--ink-2);
-  }
-  .census-mini-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
-  .census-mini-btn.danger:hover { background: var(--danger); border-color: var(--danger); }
-
-  .census-stat {
-    background: linear-gradient(180deg, rgba(45,94,62,.05), rgba(45,94,62,.02));
-    border: 1px solid rgba(45,94,62,.15);
-    border-radius: var(--radius);
-    padding: 12px 16px;
-    text-align: center;
-  }
-  .census-stat-num {
-    font-size: 28px; font-weight: 700;
-    color: var(--accent);
-    line-height: 1.1;
-  }
-  .census-stat-label {
-    font-family: -apple-system, sans-serif;
-    font-size: 11px;
-    color: var(--ink-3);
-    text-transform: uppercase; letter-spacing: .5px;
-    margin-top: 4px;
   }
 
-  .badge-d { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 10px; font-weight: 600; margin-left: 4px; }
-  .badge-d.kt { background: rgba(184,57,44,.1); color: var(--danger); }
-  .badge-d.dg { background: rgba(200,123,31,.12); color: var(--warn); }
-  .badge-d.ok { background: rgba(45,94,62,.1); color: var(--accent); }
-  .badge-d.kid { background: rgba(100,150,200,.15); color: #4a7595; }
-  .badge-d.preg { background: rgba(200,100,150,.15); color: #8a4570; }
-
-  .empty-state {
-    text-align: center;
-    padding: 40px 20px;
-    color: var(--ink-3);
-    font-family: -apple-system, sans-serif;
-  }
-  .empty-state .icon { font-size: 48px; margin-bottom: 12px; }
-  .empty-state .title { font-size: 16px; font-weight: 600; color: var(--ink-2); margin-bottom: 6px; }
-  .empty-state .desc { font-size: 13px; }
-
-  .modal-bg {
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,.5);
-    z-index: 200;
-    display: none;
-    align-items: flex-start;
-    justify-content: center;
-    padding: 20px;
-    overflow-y: auto;
-  }
-  .modal-bg.show { display: flex; }
-  .modal {
-    background: var(--bg-card);
-    border-radius: var(--radius);
-    width: 100%; max-width: 600px;
-    box-shadow: 0 24px 64px rgba(0,0,0,.3);
-    max-height: 90vh;
-    overflow-y: auto;
-    margin: auto;
-  }
-  .modal-header {
-    padding: 16px 20px;
-    border-bottom: 1px solid var(--line);
-    display: flex; justify-content: space-between; align-items: center;
-    position: sticky; top: 0;
-    background: var(--bg-card);
-    z-index: 1;
-  }
-  .modal-title { font-size: 18px; font-weight: 600; }
-  .modal-close {
-    background: none; border: none; cursor: pointer;
-    font-size: 24px; color: var(--ink-3);
-    padding: 0; width: 32px; height: 32px;
+  .pulse {
+    display: inline-block;
+    width: 8px; height: 8px;
+    background: var(--accent);
     border-radius: 50%;
+    margin-right: 6px;
+    animation: pulse 2s ease infinite;
   }
-  .modal-close:hover { background: var(--bg-card-2); color: var(--ink); }
-  .modal-body { padding: 20px; }
-  .modal-footer {
-    padding: 14px 20px;
-    border-top: 1px solid var(--line);
-    display: flex; gap: 10px; justify-content: flex-end;
-    position: sticky; bottom: 0;
-    background: var(--bg-card);
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
   }
-
-  /* === ЗАҢНАМА === */
-  .law-item { background: var(--bg-card); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; margin-bottom: 10px; box-shadow: var(--shadow); }
-  .law-num { font-family: -apple-system, sans-serif; font-size: 12px; color: var(--accent); font-weight: 600; margin-bottom: 4px; }
-  .law-name { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
-  .law-desc { font-family: -apple-system, sans-serif; font-size: 13px; color: var(--ink-2); line-height: 1.5; margin-bottom: 8px; }
-  .law-status { font-family: -apple-system, sans-serif; font-size: 11px; padding: 3px 8px; border-radius: 8px; display: inline-block; }
-  .law-status.active { background: rgba(45,94,62,.1); color: var(--accent); }
-  .law-status.updated { background: rgba(200,123,31,.12); color: var(--warn); }
-
-  footer { text-align: center; padding: 30px 20px; font-family: -apple-system, sans-serif; font-size: 11px; color: var(--ink-3); line-height: 1.6; }
-  footer strong { color: var(--ink-2); }
-
-  @media (min-width: 800px) { .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; } }
-
-  @media print {
-    body { background: white !important; }
-    .topbar, .tabs, .uch-selector, footer, .top-actions, .login-wrap { display: none !important; }
-    .section { display: block !important; page-break-after: always; }
-    .section:last-child { page-break-after: auto; }
-    .section-title { font-size: 20px; }
-    .card { box-shadow: none; border: 1px solid #ccc; page-break-inside: avoid; }
-    .alert { page-break-inside: avoid; }
-    .chart-box { height: 200px; }
-    .kpi { box-shadow: none; }
-    @page { margin: 1.5cm; size: A4; }
-  }
-  .print-header { display: none; text-align: center; border-bottom: 2px solid var(--accent); padding-bottom: 12px; margin-bottom: 20px; }
-  @media print { .print-header { display: block; } }
-  .print-header h1 { font-size: 22px; color: var(--accent); margin-bottom: 4px; }
-  .print-header .meta { font-family: -apple-system, sans-serif; font-size: 11px; color: var(--ink-3); }
 </style>
 </head>
 <body>
+<div class="container">
 
-<div class="login-wrap" id="loginWrap">
-  <div class="login-box">
-    <div class="login-logo">А</div>
-    <div class="login-title">«Аян» ЕСО</div>
-    <div class="login-sub">Басқару порталы · Кіру қажет</div>
-    <div class="login-error" id="loginErr">❌ Қате пароль. Тағы бір рет көріңіз.</div>
-    <input type="password" class="login-input" id="loginPwd" placeholder="Пароль" autocomplete="off">
-    <button class="login-btn" id="loginBtn">Кіру</button>
-    <div class="login-hint">🔒 Тек уәкілетті қызметкерлер үшін<br>Парольді бас дәрігерден алыңыз</div>
+  <div class="header">
+    <div class="header-left">
+      <div class="logo">🏥</div>
+      <div class="title-group">
+        <h1>Аян ЕСО</h1>
+        <p>Халық санағы — басқару панелі</p>
+      </div>
+    </div>
+    <div class="updated">
+      <span class="pulse"></span>Соңғы жаңарту<br>
+      <span id="updated-time">—</span>
+    </div>
   </div>
+
+  <!-- Loading -->
+  <div id="loading" class="state">
+    <div class="state-icon">⏳</div>
+    <div>Деректер жүктелуде...</div>
+  </div>
+
+  <!-- Error -->
+  <div id="error" class="state error hidden">
+    <div class="state-icon">⚠️</div>
+    <div id="error-msg">Қате орын алды</div>
+    <button class="btn" style="margin-top:20px" onclick="loadStats()">
+      <span class="btn-icon">🔄</span> Қайталау
+    </button>
+  </div>
+
+  <!-- Content -->
+  <div id="content" class="hidden">
+
+    <div class="section-label">Жалпы көрсеткіштер</div>
+    <div class="grid">
+      <div class="card accent" style="animation-delay:0.05s">
+        <span class="card-icon">👥</span>
+        <div class="card-value" id="total_patients">0</div>
+        <div class="card-label">Жалпы пациент</div>
+      </div>
+      <div class="card accent" style="animation-delay:0.1s">
+        <span class="card-icon">🏠</span>
+        <div class="card-value" id="total_houses">0</div>
+        <div class="card-label">Барлық үй</div>
+      </div>
+      <div class="card accent" style="animation-delay:0.15s">
+        <span class="card-icon">👤</span>
+        <div class="card-value" id="total_nurses">0</div>
+        <div class="card-label">Мейіргер</div>
+      </div>
+    </div>
+
+    <div class="section-label">Назар аудару керек</div>
+    <div class="grid">
+      <div class="card danger" style="animation-delay:0.2s">
+        <span class="card-icon">⏰</span>
+        <div class="card-value" id="patients_overdue">0</div>
+        <div class="card-label">Мерзімі өткен</div>
+      </div>
+      <div class="card danger" style="animation-delay:0.25s">
+        <span class="card-icon">🔴</span>
+        <div class="card-value" id="patients_high_risk">0</div>
+        <div class="card-label">Жоғары қауіп</div>
+      </div>
+      <div class="card warn" style="animation-delay:0.3s">
+        <span class="card-icon">📞</span>
+        <div class="card-value" id="patients_no_visit_30days">0</div>
+        <div class="card-label">30+ күн араланбаған</div>
+      </div>
+    </div>
+
+    <div class="section-label">Белсенділік</div>
+    <div class="grid">
+      <div class="card gold" style="animation-delay:0.35s">
+        <span class="card-icon">📅</span>
+        <div class="card-value" id="patients_with_next_visit">0</div>
+        <div class="card-label">Жоспарланған</div>
+      </div>
+      <div class="card gold" style="animation-delay:0.4s">
+        <span class="card-icon">🆕</span>
+        <div class="card-value" id="patients_new_recent">0</div>
+        <div class="card-label">Жаңа пациент (7 күн)</div>
+      </div>
+      <div class="card accent" style="animation-delay:0.45s">
+        <span class="card-icon">📊</span>
+        <div class="card-value" id="today_visits_count">0</div>
+        <div class="card-label">Бүгінгі аралау</div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn" id="refresh-btn" onclick="loadStats()">
+        <span class="btn-icon">🔄</span> Жаңарту
+      </button>
+    </div>
+  </div>
+
+  <div class="footer">
+    Аян ЕСО — Халық санағы жүйесі &middot; 2026
+  </div>
+
 </div>
 
-<header class="topbar">
-  <div class="topbar-inner">
-    <div class="brand">
-      <div class="brand-mark">А</div>
-      <div class="brand-text"><strong>«Аян» ЕСО</strong><small>Басқару порталы</small></div>
-    </div>
-    <div class="top-actions">
-      <button class="icon-btn primary" onclick="window.print()">📄 PDF</button>
-      <button class="icon-btn" onclick="logout()">🔓</button>
-    </div>
-  </div>
-</header>
-
-<nav class="tabs">
-  <div class="tabs-inner">
-    <button class="tab active" data-tab="dash">📊 Басты бет</button>
-    <button class="tab" data-tab="econ">💰 Экономика</button>
-    <button class="tab" data-tab="kpn">👥 КПН (адам басы)</button>
-    <button class="tab" data-tab="med">🩺 Медициналық</button>
-    <button class="tab" data-tab="uchastki">🏘️ Учаскелер</button>
-    <button class="tab" data-tab="weekly">📅 Апталық</button>
-    <button class="tab" data-tab="doctors">👨‍⚕️ Дәрігерлер</button>
-    <button class="tab" data-tab="errors">⚠️ Қателер</button>
-    <button class="tab" data-tab="rec">💡 Кеңестер</button>
-    <button class="tab" data-tab="salary">💵 Айлық</button>
-    <button class="tab" data-tab="census">🏘️ Халық санағы</button>
-    <button class="tab" data-tab="laws">⚖️ Заңнама</button>
-  </div>
-</nav>
-
-<main>
-  <div class="print-header">
-    <h1>«Аян» Емдеу-сауықтыру орталығы</h1>
-    <div class="meta">Басқару есебі · Қаңтар–Сәуір 2026 · Жасалған: <span id="printDate"></span></div>
-  </div>
-
-  <!-- ============ БАСТЫ БЕТ ============ -->
-  <section class="section active" id="dash">
-    <div class="section-head"><h1 class="section-title">Жалпы көрсеткіштер</h1><div class="section-sub">Қаңтар – Сәуір 2026 · 4 ай қорытындысы</div></div>
-
-    <div class="alert ok">
-      <div class="alert-icon">✅</div>
-      <div>
-        <div class="alert-title">Аванс кестесі толық орындалып тұр</div>
-        <div class="alert-text">Дополнительное соглашение №E-16-0126-00089-4 (29.04.2026) бойынша 4 айдағы аванс ұстау жоспары — <strong>50.13 млн тг</strong>. Нақты қызмет көрсетілді — <strong>58.66 млн тг</strong> (+17%). <strong>Бірақ КПН тиімділігі тек 53.8%</strong> — бұл басты алаңдататын мәселе.</div>
-      </div>
-    </div>
-
-    <div class="alert warn">
-      <div class="alert-icon">⚠️</div>
-      <div>
-        <div class="alert-title">КПН тиімділігі — басты проблема</div>
-        <div class="alert-text">12 000 бекітілген халыққа айлық КПН (1 990 тг/адам) = <strong>23.9 млн тг/ай</strong>. 4 айда жоспар = 95.5 млн. Нақты — 51.4 млн (тек прикрепленному населению). <strong>44 млн тг "жоғалған"</strong> — бұл диспансерлеу, профилактика жетіспеушілігі.</div>
-      </div>
-    </div>
-
-    <div class="kpi-grid">
-      <div class="kpi ok"><div class="kpi-label">Аванс кестесі</div><div class="kpi-value">117%</div><div class="kpi-extra ok">▲ +17% артық</div></div>
-      <div class="kpi danger"><div class="kpi-label">КПН тиімділігі</div><div class="kpi-value">53.8%</div><div class="kpi-extra danger">▼ 46.2% жетіспейді</div></div>
-      <div class="kpi"><div class="kpi-label">Бекітілген халық</div><div class="kpi-value">12 000</div><div class="kpi-extra">КПН: 1 990 тг/ай</div></div>
-      <div class="kpi warn"><div class="kpi-label">Қателер</div><div class="kpi-value">1 638</div><div class="kpi-extra">81% жөнделеді</div></div>
-    </div>
-
-    <div class="card"><div class="card-title">Айлық қызмет vs аванс жоспары</div><div class="chart-box"><canvas id="chartMain"></canvas></div></div>
-    <div class="card"><div class="card-title">2025 vs 2026 салыстыру</div><div class="chart-box"><canvas id="chartCompare"></canvas></div></div>
-  </section>
-
-  <!-- ============ ЭКОНОМИКА ============ -->
-  <section class="section" id="econ">
-    <div class="section-head"><h1 class="section-title">Экономикалық бөлім</h1><div class="section-sub">Аванс ұстау графигі (3-қосымша) · 29.04.2026 ж келісім</div></div>
-
-    <div class="alert ok">
-      <div class="alert-icon">🎯</div>
-      <div>
-        <div class="alert-title">Дұрыс түсіну</div>
-        <div class="alert-text">ҚМФ ай сайын белгілі сома аванс ұстайды. Емхана осы соманы немесе одан көп қызмет көрсетсе — толық төлемді алады. Шарттың жалпы сомасы (502.9 млн) — бұл максималды лимит, мақсат емес.</div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">Ай сайынғы қызмет vs Аванс ұстау графигі (2026, 12 ай)</div>
-      <div class="chart-box"><canvas id="chartAdvance"></canvas></div>
-      <div class="progress-extra" style="margin-top:8px;">
-        Қаңтар-маусым: 12.53 млн/ай · Шілде-қазан: 11.48 млн/ай · Қараша: 11.55 млн · Желтоқсан: 0
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">Қаңтар–Сәуір 2026: егжей-тегжейлі</div>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Ай</th><th class="num">Аванс жоспар</th><th class="num">Нақты қызмет</th><th class="num">Ауытқу</th><th class="num">%</th></tr></thead>
-          <tbody>
-            <tr><td>Қаңтар</td><td class="num">12 532 245</td><td class="num">14 192 034</td><td class="num"><span class="badge">+1 659 789</span></td><td class="num">113.2%</td></tr>
-            <tr><td>Ақпан</td><td class="num">12 532 245</td><td class="num">16 592 004</td><td class="num"><span class="badge">+4 059 759</span></td><td class="num">132.4%</td></tr>
-            <tr><td>Наурыз</td><td class="num">12 532 245</td><td class="num">13 387 572</td><td class="num"><span class="badge">+855 327</span></td><td class="num">106.8%</td></tr>
-            <tr><td>Сәуір</td><td class="num">12 532 245</td><td class="num">14 492 835</td><td class="num"><span class="badge">+1 960 590</span></td><td class="num">115.6%</td></tr>
-            <tr style="background:var(--bg-card-2);"><td><strong>4 ай</strong></td><td class="num"><strong>50 128 980</strong></td><td class="num"><strong>58 664 445</strong></td><td class="num"><span class="badge"><strong>+8 535 465</strong></span></td><td class="num"><strong>117.0%</strong></td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">Аванс ұстау категориялары · ТМККК (76.3 млн) vs МӘМС (56.4 млн)</div>
-      <div id="advanceCategories"></div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">Болжам — қалған 8 айда не болады?</div>
-      <div class="kpi-grid" style="margin-bottom:0;">
-        <div class="kpi"><div class="kpi-label">Қалған аванс ұстау</div><div class="kpi-value">82.5 млн</div><div class="kpi-extra">мам-қар (8 ай)</div></div>
-        <div class="kpi ok"><div class="kpi-label">Болжамды қызмет</div><div class="kpi-value">~117 млн</div><div class="kpi-extra ok">14.7 млн × 8</div></div>
-        <div class="kpi ok"><div class="kpi-label">Қосымша төлем</div><div class="kpi-value">~35 млн</div><div class="kpi-extra ok">актылар бойынша</div></div>
-        <div class="kpi"><div class="kpi-label">Жыл соңы кассаға</div><div class="kpi-value">~176 млн</div><div class="kpi-extra">35% шарттан</div></div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">2025 жыл — толық қорытынды (Допсоглашение №E-16-0125-00131-1)</div>
-      <div class="kpi-grid" style="margin-bottom: 14px;">
-        <div class="kpi"><div class="kpi-label">Шарт сомасы</div><div class="kpi-value">221.1 млн</div><div class="kpi-extra">100%</div></div>
-        <div class="kpi"><div class="kpi-label">Аванс (13.7%)</div><div class="kpi-value">30.2 млн</div><div class="kpi-extra">2.75 млн/ай × 11</div></div>
-        <div class="kpi ok"><div class="kpi-label">Қызмет көрсетілді</div><div class="kpi-value">136.1 млн</div><div class="kpi-extra ok">61.5%</div></div>
-        <div class="kpi"><div class="kpi-label">Айлық орт.</div><div class="kpi-value">11.3 млн</div><div class="kpi-extra">12 ай орт.</div></div>
-      </div>
-      <div class="alert ok" style="margin-bottom:0;">
-        <div class="alert-icon">✓</div>
-        <div>
-          <div class="alert-title">2025 ж аванс кестесі — теңдей бөлу</div>
-          <div class="alert-text">Қаңтар-қараша: <strong>2 745 111 тг/ай</strong> (тұрақты, 11 айға тең бөлінген), желтоқсан: 0. Айлық қызмет (~11.3 млн) аванс ұстаудан 4 есе жоғары → толық төлем алу үшін жеткілікті болды.</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 2025 vs 2026 САЛЫСТЫРУ -->
-    <div class="card">
-      <div class="card-title">⚖️ 2025 vs 2026 — стратегиялық салыстыру</div>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Көрсеткіш</th><th class="num">2025 ж</th><th class="num">2026 ж</th><th class="num">Өзгеріс</th></tr></thead>
-          <tbody>
-            <tr><td>Шарт сомасы</td><td class="num">221.1 млн</td><td class="num">502.9 млн</td><td class="num"><span class="badge">×2.27</span></td></tr>
-            <tr><td>Аванс жалпы</td><td class="num">30.2 млн</td><td class="num">132.7 млн</td><td class="num"><span class="badge warn">×4.39</span></td></tr>
-            <tr><td>Аванс үлесі шарттан</td><td class="num">13.7%</td><td class="num">26.4%</td><td class="num"><span class="badge warn">+12.7%</span></td></tr>
-            <tr><td>Айлық аванс ұстау</td><td class="num">2.75 млн</td><td class="num">12.53 млн</td><td class="num"><span class="badge warn">×4.57</span></td></tr>
-            <tr><td>МӘМС үлесі</td><td class="num">21.7%</td><td class="num">42.5%</td><td class="num"><span class="badge warn">+20.8%</span></td></tr>
-            <tr><td>ТМККК үлесі</td><td class="num">78.3%</td><td class="num">57.5%</td><td class="num"><span class="badge">−20.8%</span></td></tr>
-            <tr><td>Айлық БМСК (КПН)</td><td class="num">2.04 млн</td><td class="num">6.81 млн</td><td class="num"><span class="badge warn">×3.34</span></td></tr>
-            <tr><td>Айлық МӘМС-КДУ</td><td class="num">437 мың</td><td class="num">2.73 млн</td><td class="num"><span class="badge danger">×6.26</span></td></tr>
-            <tr><td>Айлық Стоматология</td><td class="num">132 мың</td><td class="num">748 мың</td><td class="num"><span class="badge warn">×5.66</span></td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="alert" style="margin-top:14px; margin-bottom:0;">
-        <div class="alert-icon">🚨</div>
-        <div>
-          <div class="alert-title">Стратегиялық қауіп — қарқын өспеді!</div>
-          <div class="alert-text">
-            Шарт сомасы 2.27 есе өсті, бірақ <strong>нақты қызмет көлемі 4 айда тек ~14.7 млн/ай</strong> (2025 ж 11.3 млн/ай → 2026 ж 14.7 млн/ай, тек 30% өсу).
-            <strong>МӘМС үлесі 21.7% → 42.5%-ға күрт көтерілді</strong> — бұл МӘМС қызметтерін айтарлықтай күшейту керек дегенді білдіреді (КДК, стоматология, лабораторлық).
-            Аванс ×4.4 өсті — бұл ҚМФ көп қаражат алдын ала береді, бірақ оны өтеу үшін айлық қарқын едәуір өсуі тиіс.
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 2025 АВАНС КЕСТЕСІ -->
-    <div class="card">
-      <div class="card-title">2025 ж аванс ұстау кестесі (12 ай)</div>
-      <div class="chart-box"><canvas id="chartAdvance2025"></canvas></div>
-      <div class="progress-extra" style="margin-top:8px;">
-        Қаңтар-қараша: 2 745 111 тг/ай (тұрақты) · Желтоқсан: 0 · Жалпы: 30 196 202 тг
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">2025 ж аванс категориялары</div>
-      <div id="advance2025Categories"></div>
-    </div>
-  </section>
-
-  <!-- ============ КПН (АДАМ БАСЫ) ============ -->
-  <section class="section" id="kpn">
-    <div class="section-head"><h1 class="section-title">КПН — адам басына түсетін қаражат</h1><div class="section-sub">Кешенді тариф · ҚР ДСМ-309/2020 негізінде</div></div>
-
-    <div class="alert">
-      <div class="alert-icon">🚨</div>
-      <div>
-        <div class="alert-title">КПН тиімділігі — 53.8% (4 ай орташа)</div>
-        <div class="alert-text">12 000 бекітілген халыққа 4 айда <strong>95.5 млн тг</strong> түсуі тиіс еді. Нақты қызмет — <strong>51.4 млн</strong>. Жетіспеушілік: <strong>44.1 млн тг</strong>. Бұл жоғалған кіріс — диспансерлеу, профилактика, скрининг жетіспеушілігі.</div>
-      </div>
-    </div>
-
-    <div class="kpi-grid">
-      <div class="kpi"><div class="kpi-label">Бекітілген халық</div><div class="kpi-value">12 000</div><div class="kpi-extra">РПН тіркеуінде</div></div>
-      <div class="kpi"><div class="kpi-label">КПН тариф</div><div class="kpi-value">1 990 тг</div><div class="kpi-extra">адам/ай</div></div>
-      <div class="kpi"><div class="kpi-label">Айлық КПН жалпы</div><div class="kpi-value">23.9 млн</div><div class="kpi-extra">12 000 × 1 990</div></div>
-      <div class="kpi"><div class="kpi-label">Жылдық КПН</div><div class="kpi-value">286.6 млн</div><div class="kpi-extra">23.9 × 12</div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">Учаскелер бойынша КПН тиімділігі (4 ай)</div>
-      <div id="uchKpnList"></div>
-      <div class="progress-extra" style="margin-top:12px;">Әр учаскеде шамамен 1 714 адам · Айлық КПН ~3.41 млн тг · 4 айға 13.64 млн тг қызмет көрсетуі тиіс</div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">КПН компоненттері (қандай қызметтер кіреді)</div>
-      <div style="font-family: -apple-system, sans-serif; font-size: 13px; line-height: 1.6; color: var(--ink-2);">
-        <p style="margin-bottom:10px;"><strong style="color: var(--ink);">Гарантияланған компонент (КПН гар.):</strong></p>
-        <ul style="margin-left:20px; margin-bottom:14px;">
-          <li>БМСК қызметтері (Жалпы тәжірибе дәрігері, медбике)</li>
-          <li>Профилактикалық қызметтер мен скринингтер</li>
-          <li>Диспансерлік бақылау (ҚТЖ — қант диабеті, АГ, ЖҚА, БА және т.б.)</li>
-          <li>Балалар патронаждық бақылауы</li>
-          <li>Антенатальді бақылау</li>
-        </ul>
-        <p style="margin-bottom:10px;"><strong style="color: var(--ink);">Стимулдеуші компонент (СКПН):</strong></p>
-        <ul style="margin-left:20px; margin-bottom:14px;">
-          <li>Соңғы көрсеткіштер бойынша ынталандыру (ДСМ №278/2020)</li>
-          <li>14 индикатор бойынша есептеледі</li>
-          <li>Жұмыскерлерге сыйақыға бағытталады</li>
-        </ul>
-        <p><strong style="color: var(--ink);">Маңызды:</strong> 1 990 тг — шамамен сан. Нақты КПН тарифі жыныс-жас коэффициентіне, ауылдық/қалалық санатына, тығыздық коэффициентіне байланысты есептеледі (ҚР ДСМ-309/2020 формула).</p>
-      </div>
-    </div>
-
-    <div class="rec">
-      <div class="rec-title">💡 Эксперттік ұсыныс — КПН тиімділігін арттыру</div>
-      <div class="rec-text">
-        Әр учаскеде <strong>айлық 3.41 млн тг қызмет</strong> көрсетілуі тиіс. Қазір тек 1.28-2.30 млн көрсетіледі.
-        <strong>Шаралар:</strong>
-        (1) Диспансерлік пациенттерді жоспарлы шақырту (ҚТЖ-да тіркелгендер, Д-есеп);
-        (2) Профилактикалық тексеру кампаниясын күшейту (Z-кодпен емес, нақты диагнозбен);
-        (3) Балалар патронажын мониторингке алу (анте, нео, бостандық);
-        (4) Скрининг бағдарламаларын белсендіру (ОА мойны, омырау рагы, колоректалді).
-      </div>
-      <div class="rec-law">⚖️ ҚР ДСМ-309/2020 · ҚР ДСМ-37</div>
-    </div>
-  </section>
-
-  <!-- ============ МЕДИЦИНАЛЫҚ ============ -->
-  <section class="section" id="med">
-    <div class="section-head"><h1 class="section-title">Медициналық бөлім</h1><div class="section-sub">Қызмет түрлері, диагноздар, КТҚ көрсеткіштері</div></div>
-    <div class="kpi-grid">
-      <div class="kpi"><div class="kpi-label">Барлық қызмет</div><div class="kpi-value">31 040</div><div class="kpi-extra">2026 · 4 ай</div></div>
-      <div class="kpi warn"><div class="kpi-label">Z-кодты диагноз</div><div class="kpi-value">60.8%</div><div class="kpi-extra">профилактикалық</div></div>
-      <div class="kpi danger"><div class="kpi-label">Бос диагноз</div><div class="kpi-value">309</div><div class="kpi-extra danger">толтырылмаған</div></div>
-      <div class="kpi warn"><div class="kpi-label">Қайталанулар</div><div class="kpi-value">416</div><div class="kpi-extra">бір күнде</div></div>
-    </div>
-    <div class="card"><div class="card-title">Топ-10 көрсетілген қызмет түрлері</div><div id="topServices"></div></div>
-    <div class="card"><div class="card-title">Топ диагноздар (ХАЖ-10)</div><div id="topDiagnoses"></div></div>
-    <div class="alert warn">
-      <div class="alert-icon">📋</div>
-      <div>
-        <div class="alert-title">Z-кодтар көп — нақты диагноздар жетіспейді</div>
-        <div class="alert-text">Z-кодты диагноздар <strong>60.8%</strong>. Бұл КТҚ көрсеткіштеріне әсер етеді (стимулдеуші компонент аз түседі). Диспансерлеу, ҚТЖ-ға жазу, нозологиялық диагноз қою керек.</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ УЧАСКЕЛЕР ============ -->
-  <section class="section" id="uchastki">
-    <div class="section-head"><h1 class="section-title">Учаскелер бойынша талдау</h1><div class="section-sub">7 учаске · КПН тиімділігі · Дәрігерлер</div></div>
-    <div class="card"><div class="card-title">Барлық учаскелер · КПН орындалуы</div><div class="chart-box"><canvas id="chartUchAll"></canvas></div></div>
-
-    <div class="section-head" style="margin-top: 24px;"><h2 style="font-size: 18px; margin-bottom: 6px;">Жеке учаске бойынша терең талдау</h2><div class="section-sub">Учаскені таңдаңыз ↓</div></div>
-    <div class="uch-selector" id="uchSelector">
-      <button class="uch-pill active" data-uch="1">1-учаске</button>
-      <button class="uch-pill" data-uch="2">2-учаске</button>
-      <button class="uch-pill" data-uch="3">3-учаске</button>
-      <button class="uch-pill" data-uch="4">4-учаске</button>
-      <button class="uch-pill" data-uch="5">5-учаске</button>
-      <button class="uch-pill" data-uch="6">6-учаске</button>
-      <button class="uch-pill" data-uch="7">7-учаске</button>
-    </div>
-    <div id="uchDetail"></div>
-  </section>
-
-  <!-- ============ АПТАЛЫҚ ============ -->
-  <section class="section" id="weekly">
-    <div class="section-head"><h1 class="section-title">Апта сайынғы мониторинг</h1><div class="section-sub">Орынбасарлар үшін · Әр учаске бойынша қарқын</div></div>
-    <div class="alert">
-      <div class="alert-icon">📅</div>
-      <div>
-        <div class="alert-title">Апталық мониторинг — қалай қолдану?</div>
-        <div class="alert-text">Әр учаскенің соңғы 4 апта қарқыны және орташамен салыстыруы. <strong>Жасыл</strong> — қарқын тұрақты немесе өсуде. <strong>Сары</strong> — азаюда (тексеру керек). <strong>Қызыл</strong> — едәуір төмен (шұғыл әрекет ету).</div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">Барлық учаскелер · Соңғы апталардағы қарқын</div>
-      <div class="chart-box"><canvas id="chartWeeklyAll"></canvas></div>
-    </div>
-
-    <div class="monitor-grid" id="monitorGrid"></div>
-
-    <div class="card" style="margin-top: 18px;">
-      <div class="card-title">Апталық регламент — орынбасарлар үшін нұсқаулық</div>
-      <div style="font-family: -apple-system, sans-serif; font-size: 13px; line-height: 1.6; color: var(--ink-2);">
-        <p style="margin-bottom: 8px;"><strong style="color: var(--ink);">📌 Дүйсенбі сайын (08:30):</strong> орынбасарлар алдыңғы аптаның есебін көреді (бұл портал арқылы).</p>
-        <p style="margin-bottom: 8px;"><strong style="color: var(--ink);">📌 Сейсенбі (10:00):</strong> «қызыл» учаскелердің меңгерушілерімен жұмыс отырысы (себептерді анықтау).</p>
-        <p style="margin-bottom: 8px;"><strong style="color: var(--ink);">📌 Бейсенбі:</strong> диспансерлік пациенттерді шақыру жоспары құрастырылады.</p>
-        <p style="margin-bottom: 8px;"><strong style="color: var(--ink);">📌 Жұма (15:00):</strong> аптаның ортапа қорытындысы — алдағы аптаға мақсат белгіленеді.</p>
-        <p><strong style="color: var(--ink);">Орташа норма:</strong> Әр учаске үшін аптада ~250-280 қызмет, 80-100 пациент. Айлық норма: ~1 100 қызмет, ~400 пациент.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ ДӘРІГЕРЛЕР ============ -->
-  <section class="section" id="doctors">
-    <div class="section-head"><h1 class="section-title">Дәрігерлер рейтингі</h1><div class="section-sub">Аты-жөнінің бірінші әріптерімен · 2026 ж 4 ай</div></div>
-    <div class="card">
-      <div class="card-title">Топ-20 дәрігер · Қызмет саны бойынша</div>
-      <div class="table-wrap"><table id="doctorsTable">
-        <thead><tr><th>#</th><th>Дәрігер</th><th class="num">Қызмет</th><th class="num">Пациент</th><th class="num">Орт. рет</th><th class="num">Сома (тг)</th></tr></thead>
-        <tbody></tbody>
-      </table></div>
-    </div>
-    <div class="alert warn">
-      <div class="alert-icon">⚠️</div>
-      <div>
-        <div class="alert-title">Жоғары қайталану дәрежесі</div>
-        <div class="alert-text">Кейбір дәрігерлерде «1 пациентке 8-10 рет қызмет». Қалыпты — 1-3 рет. Физиотерапия курстарын бір кодпен тіркеу әдістемесін енгізу қажет.</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ ҚАТЕЛЕР ============ -->
-  <section class="section" id="errors">
-    <div class="section-head"><h1 class="section-title">Эксперттік талдау · Қателер</h1><div class="section-sub">Жөнделетіндер мен қалдықтар · 2026 ж 4 ай</div></div>
-    <div class="kpi-grid">
-      <div class="kpi"><div class="kpi-label">Барлық «Ошибка»</div><div class="kpi-value">1 638</div><div class="kpi-extra">2026 ж 4 ай</div></div>
-      <div class="kpi warn"><div class="kpi-label">Жөнделетін</div><div class="kpi-value">1 329</div><div class="kpi-extra">81%</div></div>
-      <div class="kpi danger"><div class="kpi-label">Қалдық</div><div class="kpi-value">309</div><div class="kpi-extra danger">19%</div></div>
-      <div class="kpi danger"><div class="kpi-label">ИИН сәйкестігі</div><div class="kpi-value">14</div><div class="kpi-extra danger">бұзушылық</div></div>
-    </div>
-    <div class="alert ok">
-      <div class="alert-icon">🟢</div>
-      <div>
-        <div class="alert-title">Жақсы жаңалық: қателердің 81%-ы жөнделеді</div>
-        <div class="alert-text">«Срок» түрі — 1 329 жазба, 1.43 млн тг. Программисттер 100% жөндейді. Қалдық 309 қате (0.45 млн тг) — қолмен әрекет.</div>
-      </div>
-    </div>
-    <div class="card"><div class="card-title">Қате типтері</div><div id="errorList"></div></div>
-    <div class="card">
-      <div class="card-title">Эксперттік қорытынды</div>
-      <div style="font-family: -apple-system, sans-serif; font-size: 13px; line-height: 1.6; color: var(--ink-2);">
-        <p style="margin-bottom: 10px;"><strong style="color: var(--ink);">🟢 1. Жөнделетін (81%)</strong> — программисттер 100% жөндейді.</p>
-        <p style="margin-bottom: 10px;"><strong style="color: var(--ink);">🔴 2. Қалдық 309 жазба:</strong></p>
-        <ul style="margin-left:20px; margin-bottom: 10px;">
-          <li>89 — қайталану ("Данная услуга уже присутствует")</li>
-          <li>63 — чек-лист толтыру керек</li>
-          <li>53 — бағыттаусыз қызмет</li>
-          <li>48 — удалить запрещено</li>
-          <li>14 — ИИН врача = ИИН пациента (тікелей бұзушылық!)</li>
-        </ul>
-        <p><strong style="color: var(--ink);">3. Қайталанған 416 қызмет</strong> — сторнирование қаупі.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ КЕҢЕСТЕР ============ -->
-  <section class="section" id="rec">
-    <div class="section-head"><h1 class="section-title">Жетілдіру бойынша кеңестер</h1><div class="section-sub">Эксперттік ұсыныстар · ДСМ бұйрықтарына сілтемемен</div></div>
-
-    <div class="alert ok" style="margin-bottom: 18px;">
-      <div class="alert-icon">🎯</div>
-      <div>
-        <div class="alert-title">Қорытынды бағалау</div>
-        <div class="alert-text">Аванс кестесі — 117% (жақсы). Бірақ КПН тиімділігі — 53.8% (төмен). Негізгі күш-жігер диспансерлеу мен профилактикаға жұмсалуы тиіс.</div>
-      </div>
-    </div>
-
-    <div class="rec">
-      <div class="rec-title">🎯 1. КПН тиімділігін арттыру (басты мақсат)</div>
-      <div class="rec-text">12 000 бекітілгенге айлық 23.9 млн тг қызмет көрсетілуі тиіс. Қазір тек 14.7 млн (61.5%). Шаралар: <strong>(а)</strong> диспансерлік шақырту, <strong>(б)</strong> профилактикалық тексерулер, <strong>(в)</strong> балалар патронажы, <strong>(г)</strong> СКПН индикаторлары бойынша жұмыс.</div>
-      <div class="rec-law">⚖️ ҚР ДСМ-309/2020 · ҚР ДСМ-278/2020</div>
-    </div>
-
-    <div class="rec">
-      <div class="rec-title">🟢 2. Жөнделетін қателер — программисттермен жұмыс</div>
-      <div class="rec-text">1 329 қате (1.43 млн тг) программисттер жөндейді. IT бөлімімен апта сайын тексеру жүргізу.</div>
-      <div class="rec-law">⚖️ ҚР ДСМ-291/2020 (Ақы төлеу қағидалары)</div>
-    </div>
-
-    <div class="rec">
-      <div class="rec-title">⚠️ 3. Қалдық 309 қатені қолмен жөндеу</div>
-      <div class="rec-text">14 ИИН сәйкестік — тікелей бұзушылық, дереу жөндеу. 53 бағыттаусыз қызмет — шарт ережесін бұзу. Барлығы бойынша түсініктеме хаттар алу.</div>
-      <div class="rec-law">⚖️ ҚР ДСМ-321/2020 (Мониторинг қағидалары)</div>
-    </div>
-
-    <div class="rec">
-      <div class="rec-title">📋 4. Z-код мәселесі (60.8%)</div>
-      <div class="rec-text">Z-кодты диагноз тым жоғары, әсіресе 5-учаскеде 77.2%. Нақты нозологиялық диагноз қою керек (КТҚ — ҚТЖ — Д-есеп). Бұл СКПН көрсеткіштеріне де әсер етеді.</div>
-      <div class="rec-law">⚖️ ҚР ДСМ-37 (АПП ережелері) · ҚР ДСМ-90 (БМСК)</div>
-    </div>
-
-    <div class="rec">
-      <div class="rec-title">📅 5. Апта сайынғы мониторинг регламенті</div>
-      <div class="rec-text">Орынбасарлар әр дүйсенбі сайын апталық қарқынды тексеруі тиіс. Қызыл/сары учаскелерге дереу жұмыс. Бұл портал арқылы автоматты түрде қол жетімді.</div>
-      <div class="rec-law">📌 Ішкі регламент</div>
-    </div>
-
-    <div class="rec">
-      <div class="rec-title">⚙️ 6. ЕТЖ-ға (ЕПС) уақытында жіберу</div>
-      <div class="rec-text">Қызметтер сол күнде немесе келесі күні жіберілуі тиіс. Бұл «срок» қателерін (1 329) болашақта азайтады.</div>
-      <div class="rec-law">⚖️ ҚР ДСМ-291/2020 п.10</div>
-    </div>
-
-    <div class="rec">
-      <div class="rec-title">👥 7. Учаскелер арасындағы теңсіздік</div>
-      <div class="rec-text">1-учаске 9.22 млн, 6-учаске 5.13 млн (1.8 есе айырма). Жұмыс жүктемесін теңгерімдеу үшін: 6-учаскеде белсендіру, аумақтық бекітуді қайта қарау.</div>
-      <div class="rec-law">⚖️ ҚР ДСМ-242/2020 (Бекіту қағидалары)</div>
-    </div>
-
-    <div class="rec">
-      <div class="rec-title">💰 8. Сыртқы бағыттарды оңтайландыру</div>
-      <div class="rec-text">1, 2, 3-учаскелерден 87% сыртқы бағыттар. 4 айда 5.43 млн тг сыртқа кетті. Уролог, гинеколог қажеттілігін бағалап, штатқа алу мәселесін қарастыру.</div>
-      <div class="rec-law">⚖️ ҚР ДСМ-37 (АПП ережелері)</div>
-    </div>
-
-    <div class="rec">
-      <div class="rec-title">🩺 9. Қайталанулар мониторингі</div>
-      <div class="rec-text">416 қайталану жағдайы. Әр айдың 5-күнінде медбөлім орынбасары автоматты есеп шығаруы керек. Физиотерапия курстарын бір кодпен тіркеу.</div>
-      <div class="rec-law">⚖️ ҚР ДСМ-291/2020</div>
-    </div>
-
-    <div class="rec">
-      <div class="rec-title">📈 10. 2027 жылға стратегиялық дайындық</div>
-      <div class="rec-text">2-жартыжылдықта айлық қарқынды 18-20 млн-ға арттыру. Бұл 2027 шарт сомасының есептік базасын сақтайды (ҚМФ келесі жылы шарт сомасын азайтпайды).</div>
-      <div class="rec-law">⚖️ ҚР ДСМ-242/2020</div>
-    </div>
-
-    <div class="rec">
-      <div class="rec-title">🏥 11. 5-учаскеде Z-код проблемасы</div>
-      <div class="rec-text">5-учаскеде Z-кодты диагноз 77.2%. Учаскелік дәрігер мен медбикесіне тренинг жүргізу. Орынбасардың арнайы бақылауында болсын.</div>
-      <div class="rec-law">⚖️ ҚР ДСМ-37 · ҚР ДСМ-90</div>
-    </div>
-
-    <div class="rec">
-      <div class="rec-title">⚖️ 12. ИИН сәйкестік (14 жағдай)</div>
-      <div class="rec-text">14 жазбада дәрігер ИИН-і пациент ИИН-імен сәйкес — тікелей бұзушылық. Дәрігерлерден түсініктеме хат алып, дереу жөндеу. Қажет болса — тәртіптік жауаптылық.</div>
-      <div class="rec-law">⚖️ Еңбек кодексі · ҚР ДСМ-321/2020</div>
-    </div>
-  </section>
-
-  <!-- ============ АЙЛЫҚ КАЛЬКУЛЯТОР ============ -->
-  <section class="section" id="salary">
-    <div class="section-head">
-      <h1 class="section-title">Айлық жалақы калькуляторы</h1>
-      <div class="section-sub">2026 ж салық кодексі · ҚР Үкіметінің №1193 қаулысы</div>
-    </div>
-
-    <div class="alert ok">
-      <div class="alert-icon">⚖️</div>
-      <div>
-        <div class="alert-title">Заңнамалық негіздер (2026 ж)</div>
-        <div class="alert-text">
-          <strong>Жалақы:</strong> ҚР Үкіметінің №1193 қаулысы (31.12.2015, өзгеріс №70 — 03.02.2026), №1002 қаулысы (15.11.2023) — медициналық түзету коэф.<br>
-          <strong>Салықтар:</strong> ҚР Салық кодексі (01.01.2026 ж жаңа редакция), Заң №239-VIII (08.12.2025) — Республикалық бюджет.<br>
-          <strong>Көрсеткіштер:</strong> МРП = 4 325 тг, МЗП = 85 000 тг, БДО = 17 697 тг.
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">1. Қызметкер деректері</div>
-      <div class="salary-controls">
-        <div class="form-group">
-          <label class="form-label">Лауазым / мамандық</label>
-          <select class="form-select" id="empPosition">
-            <option value="">— Лауазымды таңдаңыз —</option>
-            <optgroup label="👨‍⚕️ Дәрігерлер (мед. түзету × 3.42)" id="grpDoctors"></optgroup>
-            <optgroup label="👩‍⚕️ Орта медициналық (× 2.34)" id="grpMid"></optgroup>
-            <optgroup label="🧹 Кіші медициналық (× 2.34)" id="grpJunior"></optgroup>
-            <optgroup label="👔 Әкімшілік" id="grpAdmin"></optgroup>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Жұмыс тәжірибесі (стаж)</label>
-          <select class="form-select" id="empExperience"></select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Штат бірлігі (ставки)</label>
-          <input type="number" class="form-input num" id="empStavki" value="1" step="0.25" min="0.25" max="2">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Қосымша лауазым (қоса атқару)</label>
-          <select class="form-select" id="empSecondPos">
-            <option value="">— Жоқ —</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">СКПН — Стимулдеуші компонент (тг)</label>
-          <div style="display:flex; gap:6px;">
-            <input type="number" class="form-input num" id="empSkpn" value="0" step="1000" placeholder="0" style="flex:1;">
-            <button type="button" class="icon-btn" onclick="autoCalcSkpn()" title="Учаске КПН тиімділігіне сай авто-есеп">⚡</button>
-          </div>
-          <div style="font-family:-apple-system,sans-serif; font-size:10px; color:var(--ink-3); margin-top:4px;">⚡ батырма — учаске бойынша автоматты есеп</div>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Учаске (СКПН авто-есеп үшін)</label>
-          <select class="form-select" id="empUchastok">
-            <option value="">— Жалпы (учаскесіз) —</option>
-            <option value="1">1-учаске</option>
-            <option value="2">2-учаске</option>
-            <option value="3">3-учаске</option>
-            <option value="4">4-учаске</option>
-            <option value="5">5-учаске</option>
-            <option value="6">6-учаске</option>
-            <option value="7">7-учаске</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Бонус/премия (сапа үшін)</label>
-          <select class="form-select" id="empBonus">
-            <option value="0">— Жоқ —</option>
-            <option value="50">🥇 Топ дәрігер/мейіргер (+50% БДО)</option>
-            <option value="30">🥈 Жоғары сапа (+30% БДО)</option>
-            <option value="15">🥉 Жақсы көрсеткіш (+15% БДО)</option>
-            <option value="100">⭐ Жыл соңы сыйлық (+100% БДО)</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Қызметкер мәртебесі</label>
-          <select class="form-select" id="empStatus">
-            <option value="standard">Қалыпты қызметкер</option>
-            <option value="disabled">Мүгедек I/II топ</option>
-            <option value="pensioner">Зейнеткер</option>
-          </select>
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">2. Қосымша төлемдер</div>
-      <div style="font-family:-apple-system,sans-serif; font-size:12px; color:var(--ink-3); margin-bottom: 10px;">
-        Қызметкерге тиесілі қосымшаларды белгілеңіз. Әр қосымша заңнамалық негізі бойынша қолданылады.
-      </div>
-      <div class="checkbox-group" id="doplatyGroup"></div>
-    </div>
-
-    <div class="salary-result-card" id="salaryResult" style="display:none;">
-      <!-- JS толтырады -->
-    </div>
-
-    <div class="card">
-      <div class="card-title">📐 Формула түсіндірмесі</div>
-      <div class="formula-box">
-<strong>1-ҚАДАМ. Должностной оклад (ДО):</strong>
-   ДО = БДО × Лауазым_коэф × Стаж_коэф × Мед_түзету × Ставка
-   <em>* Мед_түзету: дәрігерлер — 3.42, мейіргерлер — 2.34</em>
-
-<strong>2-ҚАДАМ. Қосымша төлемдер:</strong>
-   Әр қосымша өз базасынан есептеледі (БДО, ДО немесе нақты сома)
-   Барлығы қосылып БРУТТО = ДО + Доплаталар + СКПН
-
-<strong>3-ҚАДАМ. ҚЫЗМЕТКЕРДЕН ҰСТАЛАТЫНДАР (қызметкер кірісінен):</strong>
-   • <strong>ОПВ (10%)</strong> = min(брутто, 50×МЗП) × 10%
-   • <strong>ВОСМС (2%)</strong> = min(брутто, 20×МЗП) × 2%
-   • <strong>ИПН (10%)</strong> = (брутто − ОПВ − ВОСМС − 30 МРП) × 10%
-     <em>30 МРП = 129 750 тг — стандартты шегерім</em>
-
-<strong>4-ҚАДАМ. ҚОЛҒА АЛАТЫН СОМА:</strong>
-   ТАЗА = БРУТТО − ОПВ − ВОСМС − ИПН
-
-<strong>5-ҚАДАМ. ЖҰМЫС БЕРУШІ ҚОСЫМША ТӨЛЕЙДІ (қызметкер кірісіне әсер етпейді):</strong>
-   • <strong>ООСМС (3%)</strong> = min(брутто, 40×МЗП) × 3%
-   • <strong>СО (5%)</strong> = clamp(брутто − ОПВ; 1×МЗП; 7×МЗП) × 5%
-   • <strong>СН (6%)</strong> = max(1×МЗП; брутто − ОПВ − ВОСМС) × 6%, кейін СН − СО шегеріледі
-   • <strong>ОПВР (3.5%)</strong> = min(брутто, 50×МЗП) × 3.5%
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ ХАЛЫҚ САНАҒЫ (БОТТЕН ТІРІ ДЕРЕКТЕР) ============ -->
-  <section class="section" id="census">
-    <div class="section-head">
-      <h1 class="section-title">Халық санағы</h1>
-      <div class="section-sub">Telegram bot арқылы жиналған тірі деректер · Google Sheets базасынан</div>
-    </div>
-
-    <!-- API байланысы -->
-    <div class="card" id="censusApiCard">
-      <div class="card-title">🔌 API байланысы</div>
-      <div class="form-group">
-        <label class="form-label">Apps Script Web App URL</label>
-        <input type="text" class="form-input" id="censusApiUrl" 
-               placeholder="https://script.google.com/macros/s/AKfyc.../exec"
-               style="font-family: monospace; font-size: 12px;">
-        <div style="font-size: 11px; color: var(--ink-3); margin-top: 4px;">
-          Бұл URL Apps Script Deploy → Manage deployments-тан алынады. Бір рет енгізсеңіз — браузерде сақталады.
-        </div>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Сіздің Telegram ID</label>
-        <input type="text" class="form-input num" id="censusTgId" 
-               placeholder="751358211" value="751358211">
-      </div>
-      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-        <button class="btn-primary" onclick="censusConnect()" style="padding: 10px 20px; background: var(--accent); color: #fff; border: none; border-radius: 8px; cursor: pointer; font-family: -apple-system, sans-serif; font-size: 13px;">🔌 Қосылу</button>
-        <button class="btn-primary" onclick="censusRefresh()" id="censusRefreshBtn" style="display: none; padding: 10px 20px; background: var(--gold); color: var(--ink); border: none; border-radius: 8px; cursor: pointer; font-family: -apple-system, sans-serif; font-size: 13px;">🔄 Жаңарту</button>
-        <span id="censusStatus" style="font-family: -apple-system, sans-serif; font-size: 12px; color: var(--ink-3); align-self: center;"></span>
-      </div>
-    </div>
-
-    <!-- БАҚЫЛАУ ИНДИКАТОРЛАРЫ (KPI) -->
-    <div id="censusContent" style="display: none;">
-      <div class="kpi-grid" style="margin-bottom: 14px;">
-        <div class="kpi">
-          <div class="kpi-label">🏠 Барлық үйлер</div>
-          <div class="kpi-value" id="kpiHouses">0</div>
-          <div class="kpi-sub" id="kpiHousesGps">GPS-пен: 0</div>
-        </div>
-        <div class="kpi">
-          <div class="kpi-label">👥 Барлық пациенттер</div>
-          <div class="kpi-value" id="kpiPatients">0</div>
-          <div class="kpi-sub" id="kpiPatientsAttached">Бекітілген: 0</div>
-        </div>
-        <div class="kpi">
-          <div class="kpi-label">🚪 Аралаулар (барлығы)</div>
-          <div class="kpi-value" id="kpiVisits">0</div>
-          <div class="kpi-sub" id="kpiVisitsToday">Бүгін: 0</div>
-        </div>
-        <div class="kpi">
-          <div class="kpi-label">⚠️ Қауіп пациенттер</div>
-          <div class="kpi-value" id="kpiRiskHigh" style="color: var(--danger);">0</div>
-          <div class="kpi-sub" id="kpiOverdue">Мерзімі өткен: 0</div>
-        </div>
-      </div>
-
-      <!-- УЧАСКЕ САЛЫСТЫРМАЛЫ -->
-      <div class="card">
-        <div class="card-title">📊 Учаскелер бойынша</div>
-        <div id="censusUchTable" style="overflow-x: auto;"></div>
-      </div>
-
-      <!-- ҚОСЫМША ӘРЕКЕТТЕР -->
-      <div class="census-tabs" style="display: flex; gap: 6px; margin: 14px 0; flex-wrap: wrap;">
-        <button class="census-tab active" data-csec="map" style="padding: 10px 16px; background: var(--accent); color: #fff; border: none; border-radius: 8px; cursor: pointer; font-family: -apple-system, sans-serif; font-size: 13px;">🗺 Карта</button>
-        <button class="census-tab" data-csec="houses" style="padding: 10px 16px; background: var(--bg-card-2); color: var(--ink-2); border: none; border-radius: 8px; cursor: pointer; font-family: -apple-system, sans-serif; font-size: 13px;">🏠 Үйлер</button>
-        <button class="census-tab" data-csec="patients" style="padding: 10px 16px; background: var(--bg-card-2); color: var(--ink-2); border: none; border-radius: 8px; cursor: pointer; font-family: -apple-system, sans-serif; font-size: 13px;">👥 Пациенттер</button>
-        <button class="census-tab" data-csec="visits" style="padding: 10px 16px; background: var(--bg-card-2); color: var(--ink-2); border: none; border-radius: 8px; cursor: pointer; font-family: -apple-system, sans-serif; font-size: 13px;">🚪 Аралаулар</button>
-      </div>
-
-      <!-- 🗺 КАРТА -->
-      <div class="census-section active" id="csec-map">
-        <div class="card">
-          <div class="card-title">🗺 Үйлердің картадағы орналасуы</div>
-          <div style="font-size: 12px; color: var(--ink-3); margin-bottom: 10px;">
-            🟢 1-учаске · 🔵 2-учаске · 🟡 3-учаске · 🔴 4-учаске · 🟣 5-учаске · 🟠 6-учаске · ⚫ 7-учаске
-          </div>
-          <div id="censusMap" style="height: 500px; border-radius: 12px; border: 1px solid var(--line);"></div>
-          <div style="font-family: -apple-system, sans-serif; font-size: 11px; color: var(--ink-3); margin-top: 8px;">
-            💡 Картаны қозғау үшін — сүйреңіз. Жақындау/алыстау — скролл немесе +/- батырмалар.
-          </div>
-        </div>
-      </div>
-
-      <!-- 🏠 ҮЙЛЕР -->
-      <div class="census-section" id="csec-houses" style="display: none;">
-        <div class="card">
-          <div class="card-title">🏠 Үйлер тізімі</div>
-          <div style="margin-bottom: 10px; display: flex; gap: 6px; flex-wrap: wrap;">
-            <input type="text" class="form-input" id="houseFilter" placeholder="🔍 Көше немесе үй № бойынша..." style="flex: 1; min-width: 200px;">
-            <select class="form-select" id="houseUchFilter" style="min-width: 130px;">
-              <option value="">Барлық учаскелер</option>
-              <option value="1">1-учаске</option>
-              <option value="2">2-учаске</option>
-              <option value="3">3-учаске</option>
-              <option value="4">4-учаске</option>
-              <option value="5">5-учаске</option>
-              <option value="6">6-учаске</option>
-              <option value="7">7-учаске</option>
-            </select>
-          </div>
-          <div id="housesTable" style="overflow-x: auto;"></div>
-        </div>
-      </div>
-
-      <!-- 👥 ПАЦИЕНТТЕР -->
-      <div class="census-section" id="csec-patients" style="display: none;">
-        <div class="card">
-          <div class="card-title">👥 Пациенттер тізімі</div>
-          <div style="margin-bottom: 10px; display: flex; gap: 6px; flex-wrap: wrap;">
-            <input type="text" class="form-input" id="patientFilter" placeholder="🔍 Аты-жөні немесе ЖСН..." style="flex: 1; min-width: 200px;">
-            <select class="form-select" id="patientRiskFilter" style="min-width: 130px;">
-              <option value="">Барлық қауіп</option>
-              <option value="жоғары">⚠️ Жоғары</option>
-              <option value="орташа">🟡 Орташа</option>
-              <option value="төмен">🟢 Төмен</option>
-            </select>
-            <select class="form-select" id="patientUchFilter" style="min-width: 130px;">
-              <option value="">Барлық учаскелер</option>
-              <option value="1">1-учаске</option>
-              <option value="2">2-учаске</option>
-              <option value="3">3-учаске</option>
-              <option value="4">4-учаске</option>
-              <option value="5">5-учаске</option>
-              <option value="6">6-учаске</option>
-              <option value="7">7-учаске</option>
-            </select>
-          </div>
-          <div id="patientsTable" style="overflow-x: auto;"></div>
-        </div>
-      </div>
-
-      <!-- 🚪 АРАЛАУЛАР -->
-      <div class="census-section" id="csec-visits" style="display: none;">
-        <div class="card">
-          <div class="card-title">🚪 Аралау журналы</div>
-          <div style="margin-bottom: 10px; display: flex; gap: 6px; flex-wrap: wrap;">
-            <select class="form-select" id="visitTypeFilter" style="min-width: 150px;">
-              <option value="">Барлық түрлер</option>
-              <option value="профилактика">🛡 Профилактика</option>
-              <option value="диспансер">📋 Диспансерлік</option>
-              <option value="патронаж">👶 Патронаж</option>
-              <option value="жедел">🚨 Жедел</option>
-            </select>
-          </div>
-          <div id="visitsTable" style="overflow-x: auto;"></div>
-        </div>
-      </div>
-    </div>
-
-    <div id="censusEmpty" style="display: none;">
-      <div class="card" style="text-align: center; padding: 40px;">
-        <div style="font-size: 48px; margin-bottom: 12px;">🌱</div>
-        <div style="font-size: 16px; font-weight: 600; margin-bottom: 8px;">Деректер жоқ</div>
-        <div style="font-size: 13px; color: var(--ink-3);">
-          Telegram bot арқылы үйлер мен пациенттерді тіркей бастаңыз — олар бұл жерде көрінеді.
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ ЗАҢНАМА ============ -->
-  <section class="section" id="laws">
-    <div class="section-head"><h1 class="section-title">Заңнамалық база</h1><div class="section-sub">ҚР ДСМ бұйрықтары · Жоба бойынша қолданылатын</div></div>
-    <div class="alert ok">
-      <div class="alert-icon">⚖️</div>
-      <div>
-        <div class="alert-title">Заңнамалық сәйкестікті қадағалау</div>
-        <div class="alert-text">Барлық кеңестер мен есептеулер ҚР Конституциясы, «Халық денсаулығы және денсаулық сақтау жүйесі» Кодексі (07.07.2020 ж № 360-VI ҚРЗ) және ДСМ бұйрықтарына сүйенеді.</div>
-      </div>
-    </div>
-    <div id="lawsList"></div>
-  </section>
-
-</main>
-
-<footer>
-  <strong>«Аян» ЕСО · Ішкі басқару порталы</strong><br>
-  Деректер көзі: ЕТЖ (ЕПС) есептері · Шарт: №E-16-0126-00089 · Допсоглашение: №E-16-0126-00089-4 (29.04.2026)<br>
-  🔒 <strong>Тек ішкі қолданысқа</strong> · Аты-жөн қысқартылған · ҚР Заңнамасы №94-V сәйкес
-</footer>
-
 <script>
-const PWD_PLAIN = 'ayan2026';
-function showApp() {
-  document.getElementById('loginWrap').classList.add('hidden');
-  sessionStorage.setItem('ayan_auth', '1');
-  initApp();
-}
-function logout() {
-  sessionStorage.removeItem('ayan_auth');
-  document.getElementById('loginWrap').classList.remove('hidden');
-  document.getElementById('loginPwd').value = '';
-}
-document.getElementById('loginBtn').addEventListener('click', () => {
-  if (document.getElementById('loginPwd').value === PWD_PLAIN) showApp();
-  else {
-    document.getElementById('loginErr').classList.add('show');
-    setTimeout(() => document.getElementById('loginErr').classList.remove('show'), 3000);
-  }
-});
-document.getElementById('loginPwd').addEventListener('keypress', e => {
-  if (e.key === 'Enter') document.getElementById('loginBtn').click();
-});
-if (sessionStorage.getItem('ayan_auth') === '1') showApp();
-document.getElementById('printDate').textContent = new Date().toLocaleDateString('ru-RU');
+  // ⚠️ Apps Script Web App URL
+  const API_URL = "https://script.google.com/macros/s/AKfycbwmQIoCGzvhlDUbzJsf3VrDKmGE3FUSmamZcJUrjc75A8-k2R1ZPidC99eLtN0zaE0sKg/exec";
 
-const DATA = {"monthly_pay": {"2025-01": {"records": 6329, "patients": 1055, "sum_ok": 11647434.379999999, "sum_fixable": 177498.59999999998, "sum_unfixable": 18873.04, "count_fixable": 78, "count_unfixable": 26}, "2026-01": {"records": 7628, "patients": 1513, "sum_ok": 13924286.34, "sum_fixable": 267748.34, "sum_unfixable": 34307.920000000006, "count_fixable": 77, "count_unfixable": 10}, "2025-02": {"records": 6433, "patients": 1104, "sum_ok": 12022716.22, "sum_fixable": 199389.91999999998, "sum_unfixable": 7164.9400000000005, "count_fixable": 54, "count_unfixable": 2}, "2026-02": {"records": 8253, "patients": 1787, "sum_ok": 15995467.18, "sum_fixable": 596536.91, "sum_unfixable": 208864.56999999998, "count_fixable": 206, "count_unfixable": 52}, "2025-03": {"records": 5500, "patients": 947, "sum_ok": 10061820.9, "sum_fixable": 154019.97000000003, "sum_unfixable": 10115.6, "count_fixable": 45, "count_unfixable": 10}, "2026-03": {"records": 6898, "patients": 1730, "sum_ok": 13044179.01, "sum_fixable": 343392.9199999999, "sum_unfixable": 117479.81999999999, "count_fixable": 167, "count_unfixable": 29}, "2025-04": {"records": 6651, "patients": 1032, "sum_ok": 12682439.83, "sum_fixable": 259045.36999999997, "sum_unfixable": 40138.119999999995, "count_fixable": 84, "count_unfixable": 25}, "2026-04": {"records": 8261, "patients": 1747, "sum_ok": 14273700.25, "sum_fixable": 219135.34, "sum_unfixable": 84502.84, "count_fixable": 79, "count_unfixable": 45}, "2025-05": {"records": 5798, "patients": 1105, "sum_ok": 10837401.17, "sum_fixable": 122849.18000000001, "sum_unfixable": 25173.480000000003, "count_fixable": 36, "count_unfixable": 36}, "2025-06": {"records": 5839, "patients": 1090, "sum_ok": 10953430.17, "sum_fixable": 345825.82000000007, "sum_unfixable": 51334.119999999995, "count_fixable": 110, "count_unfixable": 57}, "2025-07": {"records": 5897, "patients": 1295, "sum_ok": 11339389.190000001, "sum_fixable": 95844.51999999999, "sum_unfixable": 121426.91, "count_fixable": 45, "count_unfixable": 116}, "2025-08": {"records": 6466, "patients": 1578, "sum_ok": 11228405.58, "sum_fixable": 705508.0299999999, "sum_unfixable": 228088.83000000002, "count_fixable": 133, "count_unfixable": 140}, "2025-09": {"records": 6584, "patients": 1633, "sum_ok": 10876651.440000001, "sum_fixable": 139425.46, "sum_unfixable": 378551.77999999997, "count_fixable": 68, "count_unfixable": 211}, "2025-10": {"records": 7611, "patients": 1759, "sum_ok": 12561157.879999999, "sum_fixable": 155784.30000000002, "sum_unfixable": 11608.1, "count_fixable": 78, "count_unfixable": 5}, "2025-11": {"records": 5431, "patients": 1723, "sum_ok": 10185058.450000001, "sum_fixable": 140407.47999999998, "sum_unfixable": 17186.0, "count_fixable": 58, "count_unfixable": 4}, "2025-12": {"records": 5228, "patients": 1346, "sum_ok": 9188498.870000001, "sum_fixable": 11651.009999999998, "sum_unfixable": 22779.44, "count_fixable": 11, "count_unfixable": 4}}, "uch": {"1": {"records": 4117, "sum": 9218237.5, "patients": 603, "avg_per_patient": 6.83, "population_estimated": 1714, "kpn_monthly": 3410860, "kpn_4mo": 13643440, "kpn_performance": 67.6, "empty_diag": 70, "z_diag_count": 2415, "z_diag_pct": 58.7, "duplicates": 107, "ext_count": 532, "ext_sum": 1353778.4899999998, "top_services": [{"name": "Прием: Семейный врач (Врач общей практики)", "count": 1078}, {"name": "Прием: Медицинская сестра со средним образованием", "count": 1049}, {"name": "Консультация: Акушер-гинеколог", "count": 304}, {"name": "Забор крови из вены", "count": 195}, {"name": "Доврачебный осмотр в смотровом кабинете: Медицинская сестра со средним образованием", "count": 180}], "doctors": [{"name": "ИЛХАМОВ К. К.", "services": 774, "revenue": 2219801.8200000003, "patients": 333}, {"name": "УШКЕМПІР А. Б.", "services": 431, "revenue": 222573.69999999998, "patients": 146}, {"name": "АЛМАТОВА М. Е.", "services": 380, "revenue": 160528.53, "patients": 212}, {"name": "ТУРМАХАНОВА Р. П.", "services": 304, "revenue": 1315167.84, "patients": 149}, {"name": "ТАБЫНБАЕВА К. С.", "services": 210, "revenue": 713931.5, "patients": 97}, {"name": "КАРСЫБАЙ Қ. Б.", "services": 202, "revenue": 91039.18, "patients": 97}, {"name": "ДЖАНАБИЛОВА Н. Б.", "services": 193, "revenue": 106424.06, "patients": 120}, {"name": "ДАНИСОВА Г. О.", "services": 167, "revenue": 92087.14, "patients": 115}, {"name": "ПЯК Л. Т.", "services": 159, "revenue": 651542.25, "patients": 94}, {"name": "АЛИЕВА Л. Н.", "services": 157, "revenue": 202729.38999999998, "patients": 91}], "monthly": [{"_period": "2026-01", "records": 1087, "sum": 2419240.5100000002, "patients": 264}, {"_period": "2026-02", "records": 890, "sum": 2102783.98, "patients": 266}, {"_period": "2026-03", "records": 1006, "sum": 2169545.58, "patients": 268}, {"_period": "2026-04", "records": 1134, "sum": 2526667.43, "patients": 336}], "weekly": [{"week": "W07", "year": 2026, "records": 225, "sum": 581165.7, "patients": 114}, {"week": "W08", "year": 2026, "records": 261, "sum": 647531.5700000001, "patients": 121}, {"week": "W09", "year": 2026, "records": 197, "sum": 456222.68, "patients": 93}, {"week": "W10", "year": 2026, "records": 223, "sum": 437139.79000000004, "patients": 101}, {"week": "W11", "year": 2026, "records": 285, "sum": 581993.37, "patients": 128}, {"week": "W12", "year": 2026, "records": 277, "sum": 561302.51, "patients": 125}, {"week": "W13", "year": 2026, "records": 128, "sum": 321622.57, "patients": 59}, {"week": "W14", "year": 2026, "records": 243, "sum": 632776.0, "patients": 105}, {"week": "W15", "year": 2026, "records": 239, "sum": 527410.29, "patients": 114}, {"week": "W16", "year": 2026, "records": 266, "sum": 643925.6900000001, "patients": 124}, {"week": "W17", "year": 2026, "records": 287, "sum": 616761.96, "patients": 146}, {"week": "W18", "year": 2026, "records": 192, "sum": 373280.83, "patients": 93}]}, "2": {"records": 3158, "sum": 7816145.380000001, "patients": 535, "avg_per_patient": 5.9, "population_estimated": 1714, "kpn_monthly": 3410860, "kpn_4mo": 13643440, "kpn_performance": 57.3, "empty_diag": 61, "z_diag_count": 1864, "z_diag_pct": 59.0, "duplicates": 40, "ext_count": 341, "ext_sum": 942883.15, "top_services": [{"name": "Прием: Семейный врач (Врач общей практики)", "count": 981}, {"name": "Прием: Медицинская сестра со средним образованием", "count": 652}, {"name": "Консультация: Акушер-гинеколог", "count": 235}, {"name": "Прием: Психолог", "count": 125}, {"name": "Доврачебный осмотр в смотровом кабинете: Медицинская сестра со средним образованием", "count": 122}], "doctors": [{"name": "РАХИМОВА Г. С.", "services": 372, "revenue": 1074897.72, "patients": 201}, {"name": "АЛМАТОВА М. Е.", "services": 288, "revenue": 115893.7, "patients": 155}, {"name": "ИЛХАМОВ К. К.", "services": 261, "revenue": 739130.3400000001, "patients": 143}, {"name": "ТУРМАХАНОВА Р. П.", "services": 235, "revenue": 1016659.35, "patients": 117}, {"name": "ЕСКЕРОВА Д. Ә.", "services": 205, "revenue": 113041.09999999999, "patients": 115}, {"name": "КАРСЫБАЙ Қ. Б.", "services": 171, "revenue": 72521.34999999999, "patients": 91}, {"name": "КУЛИМОВА Р. Ж.", "services": 163, "revenue": 470990.13000000006, "patients": 83}, {"name": "ТАБЫНБАЕВА К. С.", "services": 149, "revenue": 479274.07, "patients": 78}, {"name": "АЛИЕВА Л. Н.", "services": 125, "revenue": 161408.75, "patients": 80}, {"name": "АРИППАЕВ О. С.", "services": 106, "revenue": 792858.83, "patients": 74}], "monthly": [{"_period": "2026-01", "records": 846, "sum": 2075702.51, "patients": 214}, {"_period": "2026-02", "records": 946, "sum": 2442434.43, "patients": 284}, {"_period": "2026-03", "records": 779, "sum": 1869342.29, "patients": 263}, {"_period": "2026-04", "records": 587, "sum": 1428666.1500000001, "patients": 210}], "weekly": [{"week": "W07", "year": 2026, "records": 239, "sum": 636003.26, "patients": 113}, {"week": "W08", "year": 2026, "records": 222, "sum": 608722.72, "patients": 107}, {"week": "W09", "year": 2026, "records": 299, "sum": 729865.25, "patients": 148}, {"week": "W10", "year": 2026, "records": 205, "sum": 556794.27, "patients": 106}, {"week": "W11", "year": 2026, "records": 218, "sum": 491402.23000000004, "patients": 118}, {"week": "W12", "year": 2026, "records": 253, "sum": 608434.9500000001, "patients": 114}, {"week": "W13", "year": 2026, "records": 53, "sum": 110060.51, "patients": 34}, {"week": "W14", "year": 2026, "records": 150, "sum": 321542.23, "patients": 95}, {"week": "W15", "year": 2026, "records": 128, "sum": 321835.77, "patients": 71}, {"week": "W16", "year": 2026, "records": 163, "sum": 335795.89, "patients": 74}, {"week": "W17", "year": 2026, "records": 105, "sum": 321010.91000000003, "patients": 59}, {"week": "W18", "year": 2026, "records": 91, "sum": 231131.68, "patients": 53}]}, "3": {"records": 2455, "sum": 5920427.03, "patients": 382, "avg_per_patient": 6.43, "population_estimated": 1714, "kpn_monthly": 3410860, "kpn_4mo": 13643440, "kpn_performance": 43.4, "empty_diag": 52, "z_diag_count": 1303, "z_diag_pct": 53.1, "duplicates": 32, "ext_count": 347, "ext_sum": 1095443.2, "top_services": [{"name": "Прием: Семейный врач (Врач общей практики)", "count": 755}, {"name": "Прием: Медицинская сестра со средним образованием", "count": 328}, {"name": "Консультация: Акушер-гинеколог", "count": 265}, {"name": "Доврачебный осмотр в смотровом кабинете: Медицинская сестра со средним образованием", "count": 159}, {"name": "Забор крови из вены", "count": 142}], "doctors": [{"name": "ТАБЫНБАЕВА К. С.", "services": 637, "revenue": 1878480.79, "patients": 265}, {"name": "АЛМАТОВА М. Е.", "services": 336, "revenue": 125581.54999999999, "patients": 174}, {"name": "ТУРМАХАНОВА Р. П.", "services": 265, "revenue": 1146445.65, "patients": 129}, {"name": "КАРСЫБАЙ Қ. Б.", "services": 126, "revenue": 53860.74, "patients": 58}, {"name": "УШКЕМПІР А. Б.", "services": 125, "revenue": 57030.939999999995, "patients": 88}, {"name": "АЛИЕВА Л. Н.", "services": 108, "revenue": 165248.54, "patients": 73}, {"name": "НАСИРОВ Р. Р.", "services": 90, "revenue": 405000.44, "patients": 52}, {"name": "АСАН Д. Ш.", "services": 82, "revenue": 45216.439999999995, "patients": 46}, {"name": "ДЖОЛТАЕВА З. А.", "services": 80, "revenue": 44113.6, "patients": 60}, {"name": "ИЛХАМОВ К. К.", "services": 78, "revenue": 220793.86000000002, "patients": 54}], "monthly": [{"_period": "2026-01", "records": 466, "sum": 1083178.54, "patients": 124}, {"_period": "2026-02", "records": 636, "sum": 1594081.3800000001, "patients": 153}, {"_period": "2026-03", "records": 559, "sum": 1429033.6700000002, "patients": 188}, {"_period": "2026-04", "records": 794, "sum": 1814133.44, "patients": 215}], "weekly": [{"week": "W07", "year": 2026, "records": 137, "sum": 346955.47000000003, "patients": 57}, {"week": "W08", "year": 2026, "records": 170, "sum": 476048.07, "patients": 61}, {"week": "W09", "year": 2026, "records": 196, "sum": 442596.18, "patients": 78}, {"week": "W10", "year": 2026, "records": 161, "sum": 444651.41000000003, "patients": 83}, {"week": "W11", "year": 2026, "records": 129, "sum": 293602.62, "patients": 70}, {"week": "W12", "year": 2026, "records": 154, "sum": 385023.0, "patients": 70}, {"week": "W13", "year": 2026, "records": 81, "sum": 232287.65, "patients": 37}, {"week": "W14", "year": 2026, "records": 163, "sum": 402802.66000000003, "patients": 85}, {"week": "W15", "year": 2026, "records": 161, "sum": 387698.92000000004, "patients": 66}, {"week": "W16", "year": 2026, "records": 237, "sum": 454396.18, "patients": 87}, {"week": "W17", "year": 2026, "records": 166, "sum": 374394.05, "patients": 84}, {"week": "W18", "year": 2026, "records": 101, "sum": 268310.62, "patients": 51}]}, "4": {"records": 2115, "sum": 5195946.61, "patients": 419, "avg_per_patient": 5.05, "population_estimated": 1714, "kpn_monthly": 3410860, "kpn_4mo": 13643440, "kpn_performance": 38.1, "empty_diag": 50, "z_diag_count": 1275, "z_diag_pct": 60.3, "duplicates": 27, "ext_count": 180, "ext_sum": 554653.54, "top_services": [{"name": "Прием: Семейный врач (Врач общей практики)", "count": 611}, {"name": "Прием: Медицинская сестра со средним образованием", "count": 380}, {"name": "Консультация: Акушер-гинеколог", "count": 205}, {"name": "Доврачебный осмотр в смотровом кабинете: Медицинская сестра со средним образованием", "count": 97}, {"name": "Забор крови из вены", "count": 92}], "doctors": [{"name": "ТАБЫНБАЕВА К. С.", "services": 420, "revenue": 1246222.36, "patients": 208}, {"name": "АЛМАТОВА М. Е.", "services": 238, "revenue": 79890.06999999999, "patients": 147}, {"name": "ТУРМАХАНОВА Р. П.", "services": 205, "revenue": 886873.05, "patients": 108}, {"name": "КАРСЫБАЙ Қ. Б.", "services": 126, "revenue": 55036.9, "patients": 63}, {"name": "КУЛИМОВА Р. Ж.", "services": 115, "revenue": 332293.65, "patients": 72}, {"name": "АСАН Д. Ш.", "services": 110, "revenue": 60656.2, "patients": 66}, {"name": "ДЖОЛТАЕВА З. А.", "services": 102, "revenue": 56244.84, "patients": 78}, {"name": "АЛИЕВА Л. Н.", "services": 86, "revenue": 111049.22, "patients": 56}, {"name": "ИЛХАМОВ К. К.", "services": 73, "revenue": 204662.2, "patients": 51}, {"name": "УШКЕМПІР А. Б.", "services": 72, "revenue": 32835.12, "patients": 54}], "monthly": [{"_period": "2026-01", "records": 463, "sum": 1086510.34, "patients": 117}, {"_period": "2026-02", "records": 467, "sum": 1295427.55, "patients": 168}, {"_period": "2026-03", "records": 588, "sum": 1391682.58, "patients": 192}, {"_period": "2026-04", "records": 597, "sum": 1422326.1400000001, "patients": 196}], "weekly": [{"week": "W07", "year": 2026, "records": 111, "sum": 243109.22, "patients": 65}, {"week": "W08", "year": 2026, "records": 131, "sum": 447058.15, "patients": 64}, {"week": "W09", "year": 2026, "records": 103, "sum": 285218.62, "patients": 61}, {"week": "W10", "year": 2026, "records": 154, "sum": 390058.92, "patients": 67}, {"week": "W11", "year": 2026, "records": 145, "sum": 338114.19, "patients": 74}, {"week": "W12", "year": 2026, "records": 165, "sum": 325857.31, "patients": 82}, {"week": "W13", "year": 2026, "records": 55, "sum": 158035.13, "patients": 27}, {"week": "W14", "year": 2026, "records": 159, "sum": 429406.97000000003, "patients": 70}, {"week": "W15", "year": 2026, "records": 160, "sum": 376759.72000000003, "patients": 83}, {"week": "W16", "year": 2026, "records": 145, "sum": 259579.72, "patients": 65}, {"week": "W17", "year": 2026, "records": 125, "sum": 299330.71, "patients": 63}, {"week": "W18", "year": 2026, "records": 77, "sum": 236866.05000000002, "patients": 45}]}, "5": {"records": 2911, "sum": 7118884.41, "patients": 497, "avg_per_patient": 5.86, "population_estimated": 1714, "kpn_monthly": 3410860, "kpn_4mo": 13643440, "kpn_performance": 52.2, "empty_diag": 22, "z_diag_count": 2246, "z_diag_pct": 77.2, "duplicates": 97, "ext_count": 94, "ext_sum": 214400.6, "top_services": [{"name": "Прием: Семейный врач (Врач общей практики)", "count": 1167}, {"name": "Прием: Медицинская сестра со средним образованием", "count": 599}, {"name": "Вакцинация без стоимости препарата", "count": 289}, {"name": "Консультация: Оториноларинголог", "count": 121}, {"name": "Профилактические осмотры полости рта детей в детских дошкольных образовательных организациях, учащихся средних общеобразовательных организаций, женщин, вставших на учет по беременности", "count": 111}], "doctors": [{"name": "КУЛИМОВА Р. Ж.", "services": 880, "revenue": 2542768.8000000003, "patients": 346}, {"name": "АЛМАТОВА М. Е.", "services": 437, "revenue": 152888.68, "patients": 244}, {"name": "ОРАЗЫМБЕТ А. Т.", "services": 180, "revenue": 99255.59999999999, "patients": 131}, {"name": "АРИППАЕВ О. С.", "services": 152, "revenue": 743370.25, "patients": 121}, {"name": "ТАБЫНБАЕВА К. С.", "services": 136, "revenue": 397404.52, "patients": 86}, {"name": "ТҰРТАЕВА М. С.", "services": 125, "revenue": 49470.049999999996, "patients": 103}, {"name": "АУЕЗОВ К. Т.", "services": 121, "revenue": 495827.75, "patients": 102}, {"name": "ИЛХАМОВ К. К.", "services": 118, "revenue": 298767.69, "patients": 82}, {"name": "КАРСЫБАЙ Қ. Б.", "services": 103, "revenue": 51201.74, "patients": 85}, {"name": "САДВОКАСОВА Г. К.", "services": 76, "revenue": 311429.0, "patients": 75}], "monthly": [{"_period": "2026-01", "records": 498, "sum": 1172375.6400000001, "patients": 189}, {"_period": "2026-02", "records": 812, "sum": 2249838.09, "patients": 261}, {"_period": "2026-03", "records": 686, "sum": 1683645.1300000001, "patients": 230}, {"_period": "2026-04", "records": 915, "sum": 2013025.55, "patients": 267}], "weekly": [{"week": "W07", "year": 2026, "records": 216, "sum": 614297.37, "patients": 111}, {"week": "W08", "year": 2026, "records": 221, "sum": 663139.92, "patients": 106}, {"week": "W09", "year": 2026, "records": 173, "sum": 446581.08, "patients": 100}, {"week": "W10", "year": 2026, "records": 129, "sum": 307791.94, "patients": 77}, {"week": "W11", "year": 2026, "records": 165, "sum": 463798.18, "patients": 97}, {"week": "W12", "year": 2026, "records": 242, "sum": 553538.9, "patients": 96}, {"week": "W13", "year": 2026, "records": 97, "sum": 244859.36000000002, "patients": 53}, {"week": "W14", "year": 2026, "records": 154, "sum": 351639.12, "patients": 76}, {"week": "W15", "year": 2026, "records": 216, "sum": 549926.97, "patients": 95}, {"week": "W16", "year": 2026, "records": 282, "sum": 562186.11, "patients": 128}, {"week": "W17", "year": 2026, "records": 192, "sum": 376733.71, "patients": 102}, {"week": "W18", "year": 2026, "records": 124, "sum": 286196.39, "patients": 61}]}, "6": {"records": 1974, "sum": 5128156.27, "patients": 367, "avg_per_patient": 5.38, "population_estimated": 1714, "kpn_monthly": 3410860, "kpn_4mo": 13643440, "kpn_performance": 37.6, "empty_diag": 17, "z_diag_count": 1190, "z_diag_pct": 60.3, "duplicates": 35, "ext_count": 241, "ext_sum": 626481.1299999999, "top_services": [{"name": "Прием: Семейный врач (Врач общей практики)", "count": 658}, {"name": "Прием: Медицинская сестра со средним образованием", "count": 308}, {"name": "Консультация: Акушер-гинеколог", "count": 166}, {"name": "Прием: Психолог", "count": 96}, {"name": "Забор крови из вены", "count": 89}], "doctors": [{"name": "РАХИМОВА Г. С.", "services": 193, "revenue": 557675.43, "patients": 103}, {"name": "ТАБЫНБАЕВА К. С.", "services": 188, "revenue": 564979.04, "patients": 122}, {"name": "АЛМАТОВА М. Е.", "services": 181, "revenue": 69780.23, "patients": 103}, {"name": "ТУРМАХАНОВА Р. П.", "services": 166, "revenue": 718150.86, "patients": 92}, {"name": "ИЛХАМОВ К. К.", "services": 149, "revenue": 427245.68000000005, "patients": 87}, {"name": "АЛИЕВА Л. Н.", "services": 96, "revenue": 123961.92, "patients": 64}, {"name": "КАРСЫБАЙ Қ. Б.", "services": 86, "revenue": 34697.84, "patients": 51}, {"name": "ЕСКЕРОВА Д. Ә.", "services": 81, "revenue": 44665.02, "patients": 53}, {"name": "КУЛИМОВА Р. Ж.", "services": 81, "revenue": 234050.31000000003, "patients": 53}, {"name": "УШКЕМПІР А. Б.", "services": 76, "revenue": 35040.799999999996, "patients": 56}], "monthly": [{"_period": "2026-01", "records": 457, "sum": 1158211.56, "patients": 130}, {"_period": "2026-02", "records": 614, "sum": 1696206.6600000001, "patients": 170}, {"_period": "2026-03", "records": 480, "sum": 1135974.9200000002, "patients": 173}, {"_period": "2026-04", "records": 423, "sum": 1137763.1300000001, "patients": 159}], "weekly": [{"week": "W07", "year": 2026, "records": 164, "sum": 432396.64, "patients": 86}, {"week": "W08", "year": 2026, "records": 154, "sum": 531738.36, "patients": 64}, {"week": "W09", "year": 2026, "records": 129, "sum": 295733.79000000004, "patients": 58}, {"week": "W10", "year": 2026, "records": 116, "sum": 282067.3, "patients": 51}, {"week": "W11", "year": 2026, "records": 104, "sum": 253846.88, "patients": 65}, {"week": "W12", "year": 2026, "records": 171, "sum": 408925.4, "patients": 75}, {"week": "W13", "year": 2026, "records": 40, "sum": 93545.2, "patients": 26}, {"week": "W14", "year": 2026, "records": 84, "sum": 165278.04, "patients": 52}, {"week": "W15", "year": 2026, "records": 152, "sum": 426038.74, "patients": 69}, {"week": "W16", "year": 2026, "records": 106, "sum": 247180.37, "patients": 48}, {"week": "W17", "year": 2026, "records": 67, "sum": 185242.64, "patients": 39}, {"week": "W18", "year": 2026, "records": 63, "sum": 211613.48, "patients": 35}]}, "7": {"records": 2217, "sum": 5472781.09, "patients": 414, "avg_per_patient": 5.36, "population_estimated": 1714, "kpn_monthly": 3410860, "kpn_4mo": 13643440, "kpn_performance": 40.1, "empty_diag": 14, "z_diag_count": 1374, "z_diag_pct": 62.0, "duplicates": 37, "ext_count": 254, "ext_sum": 625778.3200000001, "top_services": [{"name": "Прием: Семейный врач (Врач общей практики)", "count": 682}, {"name": "Прием: Медицинская сестра со средним образованием", "count": 430}, {"name": "Консультация: Акушер-гинеколог", "count": 185}, {"name": "Консультация: Невропатолог", "count": 94}, {"name": "Доврачебный осмотр в смотровом кабинете: Медицинская сестра со средним образованием", "count": 77}], "doctors": [{"name": "ИЛХАМОВ К. К.", "services": 390, "revenue": 1110229.98, "patients": 182}, {"name": "АЛМАТОВА М. Е.", "services": 255, "revenue": 102634.48999999999, "patients": 154}, {"name": "ТУРМАХАНОВА Р. П.", "services": 185, "revenue": 800348.85, "patients": 96}, {"name": "ТАБЫНБАЕВА К. С.", "services": 135, "revenue": 419486.25, "patients": 69}, {"name": "КУЛИМОВА Р. Ж.", "services": 135, "revenue": 390083.85000000003, "patients": 74}, {"name": "КАРСЫБАЙ Қ. Б.", "services": 103, "revenue": 40941.02, "patients": 59}, {"name": "ДАНИСОВА Г. О.", "services": 79, "revenue": 43562.18, "patients": 61}, {"name": "ПЯК Л. Т.", "services": 77, "revenue": 315526.75, "patients": 50}, {"name": "АРИППАЕВ О. С.", "services": 75, "revenue": 456980.3, "patients": 57}, {"name": "АЛИЕВА Л. Н.", "services": 74, "revenue": 95553.98, "patients": 52}], "monthly": [{"_period": "2026-01", "records": 503, "sum": 1251792.3, "patients": 137}, {"_period": "2026-02", "records": 587, "sum": 1411174.6500000001, "patients": 178}, {"_period": "2026-03", "records": 587, "sum": 1437347.75, "patients": 208}, {"_period": "2026-04", "records": 540, "sum": 1372466.3900000001, "patients": 182}], "weekly": [{"week": "W07", "year": 2026, "records": 140, "sum": 394187.61, "patients": 68}, {"week": "W08", "year": 2026, "records": 142, "sum": 370450.29, "patients": 74}, {"week": "W09", "year": 2026, "records": 138, "sum": 266938.07, "patients": 83}, {"week": "W10", "year": 2026, "records": 125, "sum": 287247.72000000003, "patients": 72}, {"week": "W11", "year": 2026, "records": 123, "sum": 288391.8, "patients": 62}, {"week": "W12", "year": 2026, "records": 208, "sum": 515533.01, "patients": 84}, {"week": "W13", "year": 2026, "records": 59, "sum": 166155.04, "patients": 44}, {"week": "W14", "year": 2026, "records": 167, "sum": 475734.60000000003, "patients": 76}, {"week": "W15", "year": 2026, "records": 107, "sum": 230457.19, "patients": 55}, {"week": "W16", "year": 2026, "records": 127, "sum": 306963.11, "patients": 57}, {"week": "W17", "year": 2026, "records": 147, "sum": 340251.93, "patients": 62}, {"week": "W18", "year": 2026, "records": 64, "sum": 199079.74000000002, "patients": 39}]}}, "top_doctors_2026": [{"name_masked": "АЛМАТОВА М. Е.", "services": 2228, "revenue": 847742.33, "patients": 1266, "avg_per_patient": 1.76}, {"name_masked": "ТАБЫНБАЕВА К. С.", "services": 1987, "revenue": 6032673.45, "patients": 1023, "avg_per_patient": 1.94}, {"name_masked": "ИЛХАМОВ К. К.", "services": 1981, "revenue": 5591987.550000001, "patients": 1035, "avg_per_patient": 1.91}, {"name_masked": "КУЛИМОВА Р. Ж.", "services": 1639, "revenue": 4735906.890000001, "patients": 813, "avg_per_patient": 2.02}, {"name_masked": "ТУРМАХАНОВА Р. П.", "services": 1474, "revenue": 6376833.54, "patients": 791, "avg_per_patient": 1.86}, {"name_masked": "АРИППАЕВ О. С.", "services": 1138, "revenue": 9498072.66, "patients": 786, "avg_per_patient": 1.45}, {"name_masked": "КАРСЫБАЙ Қ. Б.", "services": 1000, "revenue": 436422.41, "patients": 561, "avg_per_patient": 1.78}, {"name_masked": "УШКЕМПІР А. Б.", "services": 939, "revenue": 459557.94, "patients": 499, "avg_per_patient": 1.88}, {"name_masked": "РАХИМОВА Г. С.", "services": 775, "revenue": 2239370.25, "patients": 444, "avg_per_patient": 1.75}, {"name_masked": "АЛИЕВА Л. Н.", "services": 692, "revenue": 919350.22, "patients": 451, "avg_per_patient": 1.53}, {"name_masked": "ПЯК Л. Т.", "services": 551, "revenue": 2257860.25, "patients": 355, "avg_per_patient": 1.55}, {"name_masked": "НАСИРОВ Р. Р.", "services": 518, "revenue": 2305085.35, "patients": 337, "avg_per_patient": 1.54}, {"name_masked": "ДЖОЛТАЕВА З. А.", "services": 478, "revenue": 263578.76, "patients": 356, "avg_per_patient": 1.34}, {"name_masked": "ЕСКЕРОВА Д. Ә.", "services": 453, "revenue": 249793.25999999998, "patients": 280, "avg_per_patient": 1.62}, {"name_masked": "АУЕЗОВ К. Т.", "services": 447, "revenue": 1831694.25, "patients": 395, "avg_per_patient": 1.13}, {"name_masked": "ДАНИСОВА Г. О.", "services": 430, "revenue": 237110.59999999998, "patients": 306, "avg_per_patient": 1.41}, {"name_masked": "АСАН Д. Ш.", "services": 395, "revenue": 217810.9, "patients": 261, "avg_per_patient": 1.51}, {"name_masked": "ТҰРТАЕВА М. С.", "services": 390, "revenue": 143044.65, "patients": 342, "avg_per_patient": 1.14}, {"name_masked": "ТУХТАМИШОВ Ф. А.", "services": 355, "revenue": 1023437.9600000001, "patients": 232, "avg_per_patient": 1.53}, {"name_masked": "ОРАЗЫМБЕТ А. Т.", "services": 328, "revenue": 180865.75999999998, "patients": 248, "avg_per_patient": 1.32}], "top_services_2026": [{"Наименование услуги": "Прием: Семейный врач (Врач общей практики)", "qty": 6422, "revenue": 18556433.220000003}, {"Наименование услуги": "Прием: Медицинская сестра со средним образованием", "qty": 4183, "revenue": 2306589.86}, {"Наименование услуги": "Консультация: Акушер-гинеколог", "qty": 1475, "revenue": 6381159.75}, {"Наименование услуги": "Электрофорез", "qty": 973, "revenue": 1063566.8399999999}, {"Наименование услуги": "Доврачебный осмотр в смотровом кабинете: Медицинская сестра со средним образованием", "qty": 789, "revenue": 0.0}, {"Наименование услуги": "Забор крови из вены", "qty": 757, "revenue": 344207.89999999997}, {"Наименование услуги": "Консультация: Невропатолог", "qty": 729, "revenue": 2987259.75}, {"Наименование услуги": "Вакцинация без стоимости препарата", "qty": 708, "revenue": 219897.71999999997}, {"Наименование услуги": "Прием: Психолог", "qty": 696, "revenue": 898723.92}, {"Наименование услуги": "Общий анализ крови 6 параметров на анализаторе", "qty": 613, "revenue": 849446.36}, {"Наименование услуги": "Иследование общего анализа мочи на анализаторе (физико-химические свойства с подсчетом количества клеточных элементов мочевого осадка)", "qty": 608, "revenue": 343368.0}, {"Наименование услуги": "Определение глюкозы в сыворотке крови на анализаторе", "qty": 538, "revenue": 56984.96}, {"Наименование услуги": "Определение аспартатаминотрансферазы (АСаТ) в сыворотке крови на анализаторе", "qty": 533, "revenue": 50427.13}, {"Наименование услуги": "Определение общего билирубина в сыворотке крови на анализаторе", "qty": 533, "revenue": 58070.35}, {"Наименование услуги": "Определение общего холестерина в сыворотке крови на анализаторе", "qty": 531, "revenue": 54661.14}, {"Наименование услуги": "Определение креатинина в сыворотке крови на анализаторе", "qty": 530, "revenue": 45336.200000000004}, {"Наименование услуги": "Определение аланинаминотрансферазы (АЛаТ) в сыворотке крови на анализаторе", "qty": 529, "revenue": 50048.69}, {"Наименование услуги": "Определение мочевины в сыворотке крови на анализаторе", "qty": 529, "revenue": 55835.95}, {"Наименование услуги": "Консультация: Оториноларинголог", "qty": 452, "revenue": 1852183.0}, {"Наименование услуги": "Измерение внутриглазного давления по Маклакову (1 глаз)", "qty": 401, "revenue": 380204.14}], "error_types_2026": [{"error": "Услуга превышает допустимый срок", "count": 427}, {"error": "Период услуги превышает допустимый срок в текущем месяце.; ", "count": 102}, {"error": "Запрещено удалять услуги", "count": 48}, {"error": "Для отправки услуги в ПС АПП требуется заполнить чек-лист ", "count": 33}, {"error": "Не отправлено направление ", "count": 21}, {"error": "Оказание услуги невозможно: ИИН врача совпадает с ИИН пациента.; ", "count": 14}, {"error": "{WebСервис.ExchangeBL.Модуль(7275)}: Поле объекта не обнаружено (Источник) - 24.02.2026 16:48:08", "count": 4}, {"error": "{WebСервис.ExchangeBL.Модуль(7275)}: Поле объекта не обнаружено (Источник) - 25.02.2026 22:00:57", "count": 4}, {"error": "Скрининг по данной целевой группе завершен; ", "count": 3}, {"error": "{WebСервис.ExchangeBL.Модуль(7275)}: Поле объекта не обнаружено (Источник) - 24.02.2026 13:47:05", "count": 2}], "self_iin_count": 14, "population": {"total": 12000, "kpn_rate": 1990, "kpn_monthly_total": 23880000, "kpn_yearly_total": 286560000}, "contract": {"2025": {"total": 221131473.31, "advance": 30196202, "completed": 133584404.08, "fixable": 2507249.66}, "2026": {"total": 502921703.84, "advance": 132660700, "gobmp": 334778658.97, "osms": 168143044.87}}, "advance_2025": {"months_kz": ["Қаңтар", "Ақпан", "Наурыз", "Сәуір", "Мамыр", "Маусым", "Шілде", "Тамыз", "Қыркүйек", "Қазан", "Қараша", "Желтоқсан"], "monthly": [2745111, 2745111, 2745111, 2745111, 2745111, 2745111, 2745111, 2745111, 2745111, 2745111, 2745092, 0], "osms_monthly": [595183, 595183, 595183, 595183, 595183, 595183, 595183, 595183, 595183, 595183, 595171, 0], "gobmp_monthly": [2149928, 2149928, 2149928, 2149928, 2149928, 2149928, 2149928, 2149928, 2149928, 2149928, 2149921, 0], "total": 30196202, "osms_total": 6547001, "gobmp_total": 23649201, "categories": [{"type": "МӘМС", "name": "Консультативті-диагностикалық қызметтер (КДК)", "total": 4803773, "monthly": 436707}, {"type": "МӘМС", "name": "Стоматология (жедел және жоспарлы)", "total": 1454723, "monthly": 132248}, {"type": "МӘМС", "name": "Стационар алмастырушы көмек", "total": 288505, "monthly": 26228}, {"type": "ТМККК", "name": "БМСК — Кешенді нормативпен (КПН)", "total": 22436625, "monthly": 2039693}, {"type": "ТМККК", "name": "Стимулдеуші компонент (СКПН)", "total": 773280, "monthly": 70299}, {"type": "ТМККК", "name": "4-санатты шақыртулар", "total": 439296, "monthly": 39936}]}, "advance_2026": {"months_kz": ["Қаңтар", "Ақпан", "Наурыз", "Сәуір", "Мамыр", "Маусым", "Шілде", "Тамыз", "Қыркүйек", "Қазан", "Қараша", "Желтоқсан"], "monthly": [12532245, 12532245, 12532245, 12532245, 12532245, 12525245, 11482245, 11482245, 11482245, 11482245, 11545250, 0], "osms_monthly": [5605946, 5605946, 5605946, 5605946, 5605946, 5598946, 4555946, 4555946, 4555946, 4555946, 4552940, 0], "gobmp_monthly": [6926299, 6926299, 6926299, 6926299, 6926299, 6926299, 6926299, 6926299, 6926299, 6926299, 6992310, 0], "total": 132660700, "osms_total": 56405400, "gobmp_total": 76255300}, "comparison": {"contract_growth": 2.274310826550518, "advance_growth": 4.393290917844569, "monthly_advance_growth": 4.565296266708341, "osms_share_2025": 21.68153796295309, "osms_share_2026": 42.51854543206843}, "salary": {"constants": {"mrp_2026": 4325, "mzp_2026": 85000, "bdo": 17697, "med_correction_high": 3.42, "med_correction_mid": 2.34, "std_vychet_mrp": 30}, "positions": {"doctors": [{"code": "glav_vrach", "name": "Бас дәрігер", "name_ru": "Главный врач", "category": "B1-3", "coef": 5.49, "class": "doctor"}, {"code": "zam_med", "name": "Бас дәрігердің медициналық мәселелер бойынша орынбасары", "name_ru": "Заместитель по мед.вопросам", "category": "B1-4", "coef": 5.11, "class": "doctor"}, {"code": "vop_higher", "name": "Жалпы тәжірибе дәрігері (жоғары санат)", "name_ru": "Врач общей практики (ВОП), высшая категория", "category": "B2-3", "coef": 5.11, "class": "doctor"}, {"code": "vop_first", "name": "Жалпы тәжірибе дәрігері (1 санат)", "name_ru": "ВОП, 1 категория", "category": "B2-4", "coef": 4.77, "class": "doctor"}, {"code": "vop_second", "name": "Жалпы тәжірибе дәрігері (2 санат)", "name_ru": "ВОП, 2 категория", "category": "B2-4", "coef": 4.4, "class": "doctor"}, {"code": "vop_no_cat", "name": "Жалпы тәжірибе дәрігері (санатсыз)", "name_ru": "ВОП без категории", "category": "B2-4", "coef": 4.13, "class": "doctor"}, {"code": "pediatr", "name": "Педиатр", "name_ru": "Педиатр", "category": "B2-4", "coef": 4.77, "class": "doctor"}, {"code": "gynecol", "name": "Акушер-гинеколог", "name_ru": "Акушер-гинеколог", "category": "B2-4", "coef": 4.3, "class": "doctor"}, {"code": "uzi", "name": "УЗИ дәрігері", "name_ru": "Врач УЗИ", "category": "B2-4", "coef": 4.26, "class": "doctor"}, {"code": "neurol", "name": "Невропатолог", "name_ru": "Невропатолог", "category": "B2-4", "coef": 4.4, "class": "doctor"}, {"code": "stomat", "name": "Стоматолог", "name_ru": "Стоматолог", "category": "B2-4", "coef": 4.13, "class": "doctor"}, {"code": "psy", "name": "Психолог", "name_ru": "Психолог", "category": "B2-4", "coef": 4.13, "class": "doctor"}, {"code": "lor", "name": "Отоларинголог (ЛОР)", "name_ru": "ЛОР", "category": "B2-4", "coef": 4.13, "class": "doctor"}, {"code": "ophthalm", "name": "Офтальмолог", "name_ru": "Офтальмолог", "category": "B2-4", "coef": 4.13, "class": "doctor"}, {"code": "cardio", "name": "Кардиолог", "name_ru": "Кардиолог", "category": "B2-4", "coef": 4.13, "class": "doctor"}, {"code": "endo", "name": "Эндокринолог", "name_ru": "Эндокринолог", "category": "B2-4", "coef": 4.13, "class": "doctor"}, {"code": "urol", "name": "Уролог", "name_ru": "Уролог", "category": "B2-4", "coef": 4.13, "class": "doctor"}, {"code": "surg", "name": "Хирург", "name_ru": "Хирург", "category": "B2-4", "coef": 4.13, "class": "doctor"}, {"code": "inf", "name": "Инфекционист", "name_ru": "Инфекционист", "category": "B2-4", "coef": 4.13, "class": "doctor"}, {"code": "dermat", "name": "Дерматолог", "name_ru": "Дерматолог", "category": "B2-4", "coef": 4.13, "class": "doctor"}, {"code": "fizio", "name": "Физиотерапевт", "name_ru": "Физиотерапевт", "category": "B2-4", "coef": 4.13, "class": "doctor"}, {"code": "lab_doctor", "name": "Зертхана дәрігері", "name_ru": "Врач лаборатории", "category": "B2-4", "coef": 4.13, "class": "doctor"}], "mid_medical": [{"code": "glav_ms", "name": "Бас медициналық бике", "name_ru": "Главная медсестра", "category": "B3-4", "coef": 3.73, "class": "nurse"}, {"code": "st_ms", "name": "Аға медициналық бике", "name_ru": "Старшая медсестра", "category": "B4-4", "coef": 3.45, "class": "nurse"}, {"code": "medstat", "name": "Медициналық статист", "name_ru": "Медстатист", "category": "B4-4", "coef": 3.73, "class": "nurse"}, {"code": "mop_uch", "name": "Учаскелік медбике (МОП)", "name_ru": "Медсестра общей практики (участковая)", "category": "B4-4", "coef": 3.53, "class": "nurse"}, {"code": "ms", "name": "Медициналық бике", "name_ru": "Медицинская сестра", "category": "B4-4", "coef": 3.45, "class": "nurse"}, {"code": "akusher", "name": "Акушерка", "name_ru": "Акушерка", "category": "B4-4", "coef": 3.45, "class": "nurse"}, {"code": "feldsher", "name": "Фельдшер", "name_ru": "Фельдшер", "category": "B4-4", "coef": 3.45, "class": "nurse"}, {"code": "lab_ass", "name": "Лаборант (фельдшер-лаборант)", "name_ru": "Лаборант", "category": "B4-4", "coef": 3.45, "class": "nurse"}, {"code": "medreg", "name": "Медициналық регистратор", "name_ru": "Медрегистратор", "category": "B4-4", "coef": 3.41, "class": "nurse"}, {"code": "massaj", "name": "Массажист", "name_ru": "Массажист", "category": "B4-4", "coef": 3.41, "class": "nurse"}, {"code": "fizio_ms", "name": "Физиотерапия медбикесі", "name_ru": "Медсестра физиотерапии", "category": "B4-4", "coef": 3.45, "class": "nurse"}], "junior_medical": [{"code": "sanitarka", "name": "Санитарка", "name_ru": "Санитарка", "category": "4 разряд", "coef": 2.9, "class": "other"}, {"code": "uborshik", "name": "Жинаушы", "name_ru": "Уборщица", "category": "3 разряд", "coef": 2.86, "class": "other"}], "admin": [{"code": "director", "name": "Директор", "name_ru": "Директор", "category": "A1", "coef": 6.5, "class": "admin"}, {"code": "glav_buh", "name": "Бас бухгалтер", "name_ru": "Главный бухгалтер", "category": "A2", "coef": 5.0, "class": "admin"}, {"code": "buh", "name": "Бухгалтер", "name_ru": "Бухгалтер", "category": "B3", "coef": 3.5, "class": "admin"}, {"code": "kadry", "name": "Кадр маманы", "name_ru": "Специалист по кадрам", "category": "B3", "coef": 3.3, "class": "admin"}, {"code": "econom", "name": "Экономист", "name_ru": "Экономист", "category": "B3", "coef": 3.5, "class": "admin"}, {"code": "jurist", "name": "Заңгер", "name_ru": "Юрист", "category": "B3", "coef": 3.5, "class": "admin"}]}, "experience": [{"label": "до 1 года", "label_kz": "1 жылға дейін", "coef": 2.4}, {"label": "1-2 года", "label_kz": "1-2 жыл", "coef": 2.44}, {"label": "2-3 года", "label_kz": "2-3 жыл", "coef": 2.49}, {"label": "3-5 лет", "label_kz": "3-5 жыл", "coef": 2.53}, {"label": "5-7 лет", "label_kz": "5-7 жыл", "coef": 2.58}, {"label": "7-9 лет", "label_kz": "7-9 жыл", "coef": 2.63}, {"label": "9-11 лет", "label_kz": "9-11 жыл", "coef": 2.68}, {"label": "11-14 лет", "label_kz": "11-14 жыл", "coef": 2.73}, {"label": "14-17 лет", "label_kz": "14-17 жыл", "coef": 2.78}, {"label": "17-20 лет", "label_kz": "17-20 жыл", "coef": 2.83}, {"label": "свыше 20 лет", "label_kz": "20 жылдан астам", "coef": 2.88}], "doplaty": [{"key": "rural", "name_kz": "Ауылдық жерде жұмыс", "name_ru": "Работа в сельской местности", "pct": 25, "base": "BDO", "law": "Прил. 5 ПП №1193"}, {"key": "patronage", "name_kz": "Учаскелік патронаждық қызмет", "name_ru": "Участковая патронажная служба", "pct": 50, "base": "BDO", "law": "Прил. 5 ПП №1193, п.4"}, {"key": "vrednost", "name_kz": "Зиянды жұмыс шарттары", "name_ru": "Вредные условия труда", "pct": 20, "base": "BDO", "law": "Прил. 5 ПП №1193"}, {"key": "vrednost_high", "name_kz": "Ерекше зиянды (рентген, инфекция)", "name_ru": "Особо вредные", "pct": 40, "base": "BDO", "law": "Прил. 5 ПП №1193"}, {"key": "vrednost_tbc", "name_kz": "Туберкулез ауруларымен жұмыс", "name_ru": "Туберкулез", "pct": 220, "base": "BDO", "law": "Прил. 5 ПП №1193 примечание"}, {"key": "kat_high", "name_kz": "Жоғары біліктілік санаты", "name_ru": "Высшая категория", "pct": 30, "base": "DO", "law": "Прил. 5 ПП №1193"}, {"key": "kat_first", "name_kz": "1-біліктілік санаты", "name_ru": "1 категория", "pct": 20, "base": "DO", "law": "Прил. 5 ПП №1193"}, {"key": "kat_second", "name_kz": "2-біліктілік санаты", "name_ru": "2 категория", "pct": 10, "base": "DO", "law": "Прил. 5 ПП №1193"}, {"key": "zaved", "name_kz": "Бөлім/кабинет меңгерушілігі", "name_ru": "Заведование отделением", "pct": 50, "base": "BDO", "law": "Прил. 18 ПП №1193, п.13"}, {"key": "glav_ms", "name_kz": "Бас медбике мәртебесі", "name_ru": "Статус \"Главная м/с\"", "pct": 30, "base": "BDO", "law": "Прил. 18 ПП №1193"}, {"key": "starshaya", "name_kz": "Аға медбике мәртебесі", "name_ru": "Статус \"Старшая\"", "pct": 25, "base": "BDO", "law": "Прил. 18 ПП №1193, п.14"}, {"key": "sovmesh", "name_kz": "Қызметтерді қоса атқару", "name_ru": "Совмещение должностей", "pct": 50, "base": "DO", "law": "ст. 111 ТК РК"}, {"key": "night", "name_kz": "Түнгі ауысым (айлық сағат негізінде)", "name_ru": "Ночные смены", "pct": 50, "base": "CUSTOM", "law": "ст. 109 ТК РК"}, {"key": "class_driver_1", "name_kz": "Жүргізуші 1-классы", "name_ru": "Водитель 1 класса", "pct": 25, "base": "DO", "law": "Прил. 18 ПП №1193"}, {"key": "class_driver_2", "name_kz": "Жүргізуші 2-классы", "name_ru": "Водитель 2 класса", "pct": 10, "base": "DO", "law": "Прил. 18 ПП №1193"}], "taxes_2026": {"opv": {"rate": 10, "name_kz": "Міндетті зейнеткерлік аударым", "name_ru": "ОПВ", "limit_mzp": 50, "description": "Қызметкерден ұсталынады, ЕНПФ-ке аударылады"}, "vosms": {"rate": 2, "name_kz": "МӘМС жарнасы (ВОСМС)", "name_ru": "ВОСМС", "limit_mzp": 20, "description": "Қызметкерден ұсталынады, ӘМСҚ-ға аударылады"}, "std_vychet": {"amount_mrp": 30, "name_kz": "Стандартты шегерім", "description": "30 МРП = 129 750 тг — ИПН азайту үшін"}, "ipn": {"rate": 10, "name_kz": "Жеке табыс салығы", "name_ru": "ИПН", "description": "База = брутто − ОПВ − ВОСМС − 30 МРП"}, "oosms": {"rate": 3, "name_kz": "МӘМС аударымы", "name_ru": "ООСМС", "limit_mzp": 40, "description": "Жұмыс беруші өз есебінен, қызметкер кірісіне әсер етпейді"}, "so": {"rate": 5, "name_kz": "Әлеуметтік аударымдар", "name_ru": "СО", "min_mzp": 1, "max_mzp": 7, "description": "Жұмыс беруші өз есебінен. База = брутто − ОПВ"}, "sn": {"rate": 6, "name_kz": "Әлеуметтік салық", "name_ru": "СН", "min_mzp": 1, "description": "Жұмыс беруші өз есебінен. База = брутто − ОПВ − ВОСМС. СН - СО"}, "opvr": {"rate": 3.5, "name_kz": "Жұмыс беруші зейнетақы аударымы", "name_ru": "ОПВР", "limit_mzp": 50, "description": "1975 ж кейін туылғандарға, жұмыс беруші өз есебінен"}}}};
-const MONTH_KZ = {'01':'Қаң','02':'Ақп','03':'Нау','04':'Сәу','05':'Мам','06':'Мау','07':'Шіл','08':'Там','09':'Қыр','10':'Қаз','11':'Қар','12':'Жел'};
-function periodLabel(p) { const [y,m]=p.split('-'); return MONTH_KZ[m]+' '+y.slice(2); }
-function fmtNum(n, dec=0) { return Number(n).toLocaleString('ru-RU', {minimumFractionDigits:dec, maximumFractionDigits:dec}); }
-function fmtMln(n) { return (n/1e6).toFixed(1)+' млн'; }
+  function show(id) { document.getElementById(id).classList.remove("hidden"); }
+  function hide(id) { document.getElementById(id).classList.add("hidden"); }
 
-let inited = false;
-let uchChartInstance = null;
-
-function initApp() {
-  if (inited) return;
-  inited = true;
-
-  document.querySelectorAll('.tab').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-      btn.classList.add('active');
-      document.getElementById(btn.dataset.tab).classList.add('active');
-      window.scrollTo({top: 0, behavior: 'smooth'});
-    });
-  });
-
-  Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
-  Chart.defaults.color = '#4a4d48';
-
-  // === НЕГІЗГІ ГРАФИК ===
-  const m26Periods = ['2026-01','2026-02','2026-03','2026-04'];
-  const m26Sum = m26Periods.map(p => DATA.monthly_pay[p].sum_ok + DATA.monthly_pay[p].sum_fixable);
-
-  new Chart(document.getElementById('chartMain'), {
-    type:'bar',
-    data:{
-      labels: m26Periods.map(periodLabel),
-      datasets:[
-        { label:'Нақты қызмет (тг)', data: m26Sum, backgroundColor:'#2d5e3e', borderRadius:6 },
-        { label:'Аванс ұстау (12.53 млн)', data: m26Periods.map(()=>12532245), type:'line', borderColor:'#c8a951', borderWidth:2.5, pointRadius:3, backgroundColor:'transparent' }
-      ]
-    },
-    options: {
-      responsive:true, maintainAspectRatio:false,
-      plugins:{ legend:{position:'bottom', labels:{boxWidth:14, font:{size:11}}}, tooltip:{callbacks:{label:c=>c.dataset.label+': '+fmtNum(c.parsed.y)+' тг'}}},
-      scales:{ y:{ticks:{callback:v=>fmtMln(v)}, grid:{color:'#e3dfd5'}}, x:{grid:{display:false}}}
-    }
-  });
-
-  // === 2025 vs 2026 ===
-  const m25Periods = ['2025-01','2025-02','2025-03','2025-04'];
-  const m25Sum = m25Periods.map(p => DATA.monthly_pay[p].sum_ok);
-  new Chart(document.getElementById('chartCompare'), {
-    type:'line',
-    data:{
-      labels:['Қаңтар','Ақпан','Наурыз','Сәуір'],
-      datasets:[
-        { label:'2025', data: m25Sum, borderColor:'#8a8d88', backgroundColor:'rgba(138,141,136,.1)', tension:.3, fill:true, borderWidth:2 },
-        { label:'2026', data: m26Sum, borderColor:'#2d5e3e', backgroundColor:'rgba(45,94,62,.1)', tension:.3, fill:true, borderWidth:2.5 }
-      ]
-    },
-    options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{position:'bottom', labels:{boxWidth:14, font:{size:11}}}, tooltip:{callbacks:{label:c=>c.dataset.label+': '+fmtNum(c.parsed.y)+' тг'}}}, scales:{ y:{ticks:{callback:v=>fmtMln(v)}, grid:{color:'#e3dfd5'}}, x:{grid:{display:false}}}}
-  });
-
-  // === АВАНС ГРАФИГІ ===
-  const advCtx = document.getElementById('chartAdvance');
-  if (advCtx) {
-    const advance12 = DATA.advance_2026.monthly.map(v => v/1e6);
-    const actual4 = m26Sum.map(v => v/1e6);
-    new Chart(advCtx, {
-      type:'bar',
-      data:{
-        labels: DATA.advance_2026.months_kz,
-        datasets:[
-          { label:'Аванс ұстау жоспары', data: advance12, backgroundColor:'#c8a951', borderRadius:6 },
-          { label:'Нақты қызмет', data: [...actual4, null,null,null,null,null,null,null,null], backgroundColor:'#2d5e3e', borderRadius:6 }
-        ]
-      },
-      options:{
-        responsive:true, maintainAspectRatio:false,
-        plugins:{ legend:{position:'bottom', labels:{boxWidth:14, font:{size:11}}}, tooltip:{callbacks:{label:c=>c.dataset.label+': '+(c.parsed.y!==null?c.parsed.y.toFixed(2)+' млн':'')}}},
-        scales:{ y:{grid:{color:'#e3dfd5'}, ticks:{callback:v=>v.toFixed(0)+' млн'}}, x:{grid:{display:false}}}
-      }
-    });
-  }
-
-  // === АВАНС КАТЕГОРИЯЛАРЫ ===
-  const advCatEl = document.getElementById('advanceCategories');
-  if (advCatEl) {
-    const cats = [
-      {name:'БМСК — Кешенді нормативпен', type:'ТМККК', total:74921000},
-      {name:'Консультативті-диагностикалық қызметтер', type:'МӘМС', total:30078400},
-      {name:'Стоматология (жедел және жоспарлы)', type:'МӘМС', total:8233000},
-      {name:'Лабораторлық зерттеулер', type:'МӘМС', total:6293000},
-      {name:'Стационар алмастырушы көмек', type:'МӘМС', total:4370600},
-      {name:'Медициналық оңалту КС 3-кезең', type:'МӘМС', total:4271400},
-      {name:'Антенатальді бақылау', type:'МӘМС', total:1605000},
-      {name:'Балалар профилактикалық тексеру', type:'МӘМС', total:1554000},
-      {name:'4-санатты шақыртулар', type:'ТМККК', total:1334300},
-    ];
-    const maxT = Math.max(...cats.map(c=>c.total));
-    advCatEl.innerHTML = cats.map(c => `
-      <div class="progress-row">
-        <div class="progress-head">
-          <span class="progress-label"><span class="badge ${c.type==='МӘМС'?'warn':''}">${c.type}</span> ${c.name}</span>
-          <span class="progress-val">${(c.total/1e6).toFixed(2)} млн</span>
-        </div>
-        <div class="progress-bar"><div class="progress-fill" style="width:${(c.total/maxT*100).toFixed(1)}%"></div></div>
-      </div>
-    `).join('');
-  }
-
-  // === КПН УЧАСКЕЛЕР ===
-  const uchKpnEl = document.getElementById('uchKpnList');
-  if (uchKpnEl) {
-    const uchKeys = ['1','2','3','4','5','6','7'];
-    const sorted = uchKeys.map(k => ({k, ...DATA.uch[k]})).sort((a,b) => b.kpn_performance - a.kpn_performance);
-    uchKpnEl.innerHTML = sorted.map((u, i) => {
-      const cls = u.kpn_performance >= 70 ? '' : (u.kpn_performance >= 50 ? 'warn' : 'danger');
-      const medal = i===0?'🥇':(i===1?'🥈':(i===2?'🥉':''));
-      return `
-        <div class="progress-row">
-          <div class="progress-head">
-            <span class="progress-label"><strong>${medal} ${u.k}-учаске</strong> · ${fmtNum(u.records)} қызмет, ${fmtNum(u.sum,0)} тг</span>
-            <span class="progress-val">${u.kpn_performance}%</span>
-          </div>
-          <div class="progress-bar"><div class="progress-fill ${cls}" style="width:${Math.min(100, u.kpn_performance)}%"></div></div>
-          <div class="progress-extra">КПН жоспар: ${fmtNum(u.kpn_4mo,0)} тг (4 ай) · Нақты: ${fmtNum(u.sum,0)} тг · Жетіспейді: ${fmtNum(u.kpn_4mo - u.sum, 0)} тг</div>
-        </div>
-      `;
-    }).join('');
-  }
-
-  // === Топ қызмет ===
-  const topSvc = DATA.top_services_2026.slice(0,10);
-  const maxQty = Math.max(...topSvc.map(s=>s.qty));
-  document.getElementById('topServices').innerHTML = topSvc.map(s=>`
-    <div class="progress-row">
-      <div class="progress-head"><span class="progress-label">${s['Наименование услуги']}</span><span class="progress-val">${fmtNum(s.qty)}</span></div>
-      <div class="progress-bar"><div class="progress-fill" style="width:${(s.qty/maxQty*100).toFixed(1)}%"></div></div>
-      <div class="progress-extra">${fmtNum(s.revenue,0)} тг</div>
-    </div>
-  `).join('');
-
-  // === Диагноздар ===
-  const diags = [
-    {code:'Z92.8', name:'В личном анамнезе другие виды лечения', count:3556, type:'warn'},
-    {code:'Z00.0', name:'Общий медицинский осмотр', count:1902, type:'warn'},
-    {code:'Z13.8', name:'Скрининговое обследование', count:1174, type:'warn'},
-    {code:'Z13.4', name:'Скрининг развития ребенка', count:1085, type:'warn'},
-    {code:'Z30.0', name:'Консультации по контрацепции', count:1020, type:'warn'},
-    {code:'I11.9', name:'Гипертензивная болезнь', count:784, type:'ok'},
-    {code:'N76.8', name:'Воспалительные болезни вульвы', count:773, type:'ok'},
-    {code:'Z71.8', name:'Другое уточненное консультирование', count:688, type:'warn'},
-    {code:'K86.1', name:'Хронические панкреатиты', count:646, type:'ok'},
-    {code:'K04.0', name:'Пульпит', count:603, type:'ok'},
-  ];
-  document.getElementById('topDiagnoses').innerHTML = diags.map((d,i)=>`
-    <div class="list-item">
-      <div class="list-num ${i<3?'top':''}">${i+1}</div>
-      <div class="list-content">
-        <div class="list-text"><span class="badge ${d.type==='warn'?'warn':''}">${d.code}</span> ${d.name}</div>
-        <div class="list-meta">${d.type==='warn'?'⚠️ Профилактикалық (Z-код)':'✓ Нозологиялық'}</div>
-      </div>
-      <div class="list-val">${fmtNum(d.count)}</div>
-    </div>
-  `).join('');
-
-  // === Дәрігерлер ===
-  document.querySelector('#doctorsTable tbody').innerHTML = DATA.top_doctors_2026.map((d,i)=>{
-    const flag = d.avg_per_patient > 5 ? '<span class="badge warn">⚠️</span> ' : '';
-    return `<tr><td>${i+1}</td><td>${flag}${d.name_masked}</td><td class="num">${fmtNum(d.services)}</td><td class="num">${fmtNum(d.patients)}</td><td class="num">${d.avg_per_patient}</td><td class="num">${fmtNum(d.revenue,0)}</td></tr>`;
-  }).join('');
-
-  // === Қателер ===
-  const errs = DATA.error_types_2026;
-  const maxErr = Math.max(...errs.map(e=>e.count));
-  document.getElementById('errorList').innerHTML = errs.map((e,i)=>`
-    <div class="list-item">
-      <div class="list-num ${i<3?'top':''}">${i+1}</div>
-      <div class="list-content">
-        <div class="list-text">${e.error}</div>
-        <div class="progress-bar" style="margin-top:6px;"><div class="progress-fill danger" style="width:${(e.count/maxErr*100).toFixed(1)}%"></div></div>
-      </div>
-      <div class="list-val">${fmtNum(e.count)}</div>
-    </div>
-  `).join('');
-
-  // === УЧАСКЕЛЕР ЖАЛПЫ ГРАФИК (КПН тиімділігі) ===
-  const uchKeys = ['1','2','3','4','5','6','7'];
-  const uchPerf = uchKeys.map(k => DATA.uch[k].kpn_performance);
-  const uchSum = uchKeys.map(k => DATA.uch[k].sum/1e6);
-  const uchKpn = uchKeys.map(k => DATA.uch[k].kpn_4mo/1e6);
-
-  new Chart(document.getElementById('chartUchAll'), {
-    type:'bar',
-    data:{
-      labels: uchKeys.map(k=>k+'-уч.'),
-      datasets:[
-        { label:'Нақты қызмет (млн)', data: uchSum, backgroundColor:'#2d5e3e', borderRadius:6 },
-        { label:'КПН жоспары 4 ай (млн)', data: uchKpn, backgroundColor:'rgba(200,169,81,.4)', borderRadius:6 }
-      ]
-    },
-    options:{
-      responsive:true, maintainAspectRatio:false,
-      plugins:{ legend:{position:'bottom', labels:{boxWidth:14, font:{size:11}}}, tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.parsed.y.toFixed(2)+' млн'}}},
-      scales:{ y:{grid:{color:'#e3dfd5'}, ticks:{callback:v=>v.toFixed(1)+' млн'}}, x:{grid:{display:false}}}
-    }
-  });
-
-  // === АПТАЛЫҚ МОНИТОРИНГ ===
-  renderWeeklyMonitor();
-
-  // === 2025 АВАНС ГРАФИГІ ===
-  const adv25Ctx = document.getElementById('chartAdvance2025');
-  if (adv25Ctx) {
-    const adv25 = DATA.advance_2025;
-    new Chart(adv25Ctx, {
-      type:'bar',
-      data:{
-        labels: adv25.months_kz,
-        datasets:[
-          { label:'ТМККК аванс', data: adv25.gobmp_monthly.map(v=>v/1e6), backgroundColor:'#2d5e3e', borderRadius:6, stack:'a' },
-          { label:'МӘМС аванс', data: adv25.osms_monthly.map(v=>v/1e6), backgroundColor:'#c8a951', borderRadius:6, stack:'a' }
-        ]
-      },
-      options:{
-        responsive:true, maintainAspectRatio:false,
-        plugins:{ legend:{position:'bottom', labels:{boxWidth:14, font:{size:11}}}, tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.parsed.y.toFixed(2)+' млн'}}},
-        scales:{ y:{stacked:true, grid:{color:'#e3dfd5'}, ticks:{callback:v=>v.toFixed(1)+' млн'}}, x:{stacked:true, grid:{display:false}}}
-      }
-    });
-  }
-
-  // === 2025 КАТЕГОРИЯЛАРЫ ===
-  const adv25CatEl = document.getElementById('advance2025Categories');
-  if (adv25CatEl) {
-    const cats = DATA.advance_2025.categories;
-    const maxT = Math.max(...cats.map(c=>c.total));
-    adv25CatEl.innerHTML = cats.map(c => `
-      <div class="progress-row">
-        <div class="progress-head">
-          <span class="progress-label"><span class="badge ${c.type==='МӘМС'?'warn':''}">${c.type}</span> ${c.name}</span>
-          <span class="progress-val">${(c.total/1e6).toFixed(2)} млн</span>
-        </div>
-        <div class="progress-bar"><div class="progress-fill" style="width:${(c.total/maxT*100).toFixed(1)}%"></div></div>
-        <div class="progress-extra">Айлық: ${(c.monthly/1e3).toFixed(0)} мың тг (11 ай)</div>
-      </div>
-    `).join('');
-  }
-
-  // === АЙЛЫҚ КАЛЬКУЛЯТОР ===
-  initSalaryCalc();
-
-  // === ЗАҢНАМА ===
-  renderLaws();
-
-  // Учаске таңдау
-  document.querySelectorAll('.uch-pill').forEach(p => {
-    p.addEventListener('click', () => {
-      document.querySelectorAll('.uch-pill').forEach(x => x.classList.remove('active'));
-      p.classList.add('active');
-      renderUch(p.dataset.uch);
-    });
-  });
-  renderUch('1');
-}
-
-function renderUch(k) {
-  const u = DATA.uch[k];
-  const empty_pct = (u.empty_diag / u.records * 100).toFixed(1);
-  const dup_pct = (u.duplicates / u.records * 100).toFixed(1);
-
-  const docs = u.doctors.slice(0, 8).map((d,i)=>`
-    <tr><td>${i+1}</td><td>${d.name}</td><td class="num">${fmtNum(d.services)}</td><td class="num">${fmtNum(d.revenue,0)}</td></tr>
-  `).join('');
-
-  const max_svc = Math.max(...u.top_services.map(x=>x.count));
-  const services = u.top_services.map(s => `
-    <div class="progress-row">
-      <div class="progress-head"><span class="progress-label">${s.name}</span><span class="progress-val">${fmtNum(s.count)}</span></div>
-      <div class="progress-bar"><div class="progress-fill" style="width:${(s.count/max_svc*100).toFixed(1)}%"></div></div>
-    </div>
-  `).join('');
-
-  const adv = getUchAdvice(k, u);
-
-  const html = `
-    <div class="kpi-grid">
-      <div class="kpi"><div class="kpi-label">Қызмет саны</div><div class="kpi-value">${fmtNum(u.records)}</div><div class="kpi-extra">4 айда</div></div>
-      <div class="kpi"><div class="kpi-label">Сома</div><div class="kpi-value">${(u.sum/1e6).toFixed(2)} млн</div><div class="kpi-extra">тг</div></div>
-      <div class="kpi ${u.kpn_performance<50?'danger':(u.kpn_performance<70?'warn':'ok')}"><div class="kpi-label">КПН тиімділігі</div><div class="kpi-value">${u.kpn_performance}%</div><div class="kpi-extra">~${u.population_estimated} адам</div></div>
-      <div class="kpi"><div class="kpi-label">Пациент</div><div class="kpi-value">${fmtNum(u.patients)}</div><div class="kpi-extra">қызмет алған</div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">Айлық динамика</div>
-      <div class="chart-box" style="height:200px;"><canvas id="uchMonthlyChart"></canvas></div>
-    </div>
-
-    <div class="grid-2">
-      <div class="card">
-        <div class="card-title">Топ-5 қызмет түрі</div>
-        ${services}
-      </div>
-      <div class="card">
-        <div class="card-title">Топ дәрігерлер</div>
-        <div class="table-wrap"><table>
-          <thead><tr><th>#</th><th>Аты</th><th class="num">Қызмет</th><th class="num">Сома</th></tr></thead>
-          <tbody>${docs}</tbody>
-        </table></div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">Сапа көрсеткіштері</div>
-      <div class="kpi-grid" style="margin-bottom:0;">
-        <div class="kpi ${empty_pct>3?'danger':''}"><div class="kpi-label">Бос диагноз</div><div class="kpi-value">${u.empty_diag}</div><div class="kpi-extra">${empty_pct}%</div></div>
-        <div class="kpi ${u.z_diag_pct>70?'danger':(u.z_diag_pct>60?'warn':'')}"><div class="kpi-label">Z-код диагноз</div><div class="kpi-value">${u.z_diag_pct}%</div><div class="kpi-extra">${u.z_diag_count} жазба</div></div>
-        <div class="kpi ${dup_pct>3?'danger':'warn'}"><div class="kpi-label">Қайталану</div><div class="kpi-value">${u.duplicates}</div><div class="kpi-extra">${dup_pct}%</div></div>
-        <div class="kpi ${u.ext_count>1500?'danger':(u.ext_count>500?'warn':'')}"><div class="kpi-label">Сыртқа жіберу</div><div class="kpi-value">${fmtNum(u.ext_count)}</div><div class="kpi-extra">${(u.ext_sum/1e6).toFixed(2)} млн тг</div></div>
-      </div>
-    </div>
-
-    <div class="alert ${adv.cls==='ok'?'ok':(adv.cls==='warn'?'warn':'')}">
-      <div class="alert-icon">${adv.icon}</div>
-      <div>
-        <div class="alert-title">${k}-учаске: ${adv.title}</div>
-        <div class="alert-text">${adv.text}</div>
-      </div>
-    </div>
-  `;
-  document.getElementById('uchDetail').innerHTML = html;
-
-  if (uchChartInstance) uchChartInstance.destroy();
-  const ctx = document.getElementById('uchMonthlyChart');
-  if (ctx) {
-    uchChartInstance = new Chart(ctx, {
-      type:'bar',
-      data:{
-        labels: u.monthly.map(m=>periodLabel(m._period)),
-        datasets:[{ label:'Сома (тг)', data: u.monthly.map(m=>m.sum), backgroundColor:'#2d5e3e', borderRadius:6 }]
-      },
-      options:{
-        responsive:true, maintainAspectRatio:false,
-        plugins:{legend:{display:false}, tooltip:{callbacks:{label:c=>fmtNum(c.parsed.y)+' тг'}}},
-        scales:{y:{ticks:{callback:v=>fmtMln(v)}, grid:{color:'#e3dfd5'}}, x:{grid:{display:false}}}
-      }
-    });
-  }
-}
-
-function getUchAdvice(k, u) {
-  const tips = [];
-  let cls = 'ok';
-  let icon = '✅';
-  let title = 'Қанағаттанарлық';
-
-  if (u.kpn_performance < 50) {
-    tips.push(`КПН тиімділігі ${u.kpn_performance}% — өте төмен. ~${u.population_estimated} бекітілген халыққа айлық 3.41 млн тг қызмет көрсетілуі тиіс`);
-    cls = 'danger'; icon = '🔴'; title = 'Шұғыл әрекет ету керек';
-  } else if (u.kpn_performance < 70) {
-    tips.push(`КПН тиімділігі ${u.kpn_performance}% — жетіспейді`);
-    cls = 'warn'; icon = '⚠️'; title = 'Жетілдіру қажет';
-  }
-
-  if (u.z_diag_pct > 70) tips.push(`Z-кодты диагноз ${u.z_diag_pct}% — нақты диагноз қою керек`);
-  if (u.empty_diag / u.records > 0.03) tips.push(`Бос диагноз ${(u.empty_diag/u.records*100).toFixed(1)}%`);
-  if (u.duplicates / u.records > 0.03) tips.push(`Қайталану ${(u.duplicates/u.records*100).toFixed(1)}% жоғары`);
-  if (u.ext_count > 1500) tips.push(`Сыртқы бағыттар ${u.ext_count} (${(u.ext_sum/1e6).toFixed(1)} млн тг) — шарттан шегерілуі мүмкін`);
-
-  if (tips.length === 0) tips.push('Учаске қалыпты жұмыс істеп тұр');
-  return { cls, icon, title, text: tips.join('. ') + '.' };
-}
-
-// === АПТАЛЫҚ МОНИТОРИНГ ===
-function renderWeeklyMonitor() {
-  const grid = document.getElementById('monitorGrid');
-  const uchKeys = ['1','2','3','4','5','6','7'];
-
-  // Барлық учаскелер бойынша барлық апталардың тізімі
-  const allWeeks = new Set();
-  uchKeys.forEach(k => DATA.uch[k].weekly.forEach(w => allWeeks.add(`${w.year}-${w.week}`)));
-  const sortedWeeks = Array.from(allWeeks).sort();
-  const lastWeeks = sortedWeeks.slice(-8); // соңғы 8 апта
-
-  // Барлық учаскелердің графигі
-  const ctxAll = document.getElementById('chartWeeklyAll');
-  if (ctxAll) {
-    const colors = ['#2d5e3e','#c8a951','#b8392c','#c87b1f','#5a8a5a','#8a5a8a','#5a8a8a'];
-    const datasets = uchKeys.map((k, i) => {
-      const data = lastWeeks.map(w => {
-        const wk = DATA.uch[k].weekly.find(x => `${x.year}-${x.week}` === w);
-        return wk ? wk.records : 0;
-      });
-      return {
-        label: k+'-уч.',
-        data,
-        borderColor: colors[i],
-        backgroundColor: colors[i] + '20',
-        tension: .3,
-        borderWidth: 2,
-        pointRadius: 3,
-      };
-    });
-
-    new Chart(ctxAll, {
-      type:'line',
-      data:{ labels: lastWeeks.map(w => w.split('-')[1].replace('W', 'Апта ')), datasets },
-      options:{
-        responsive:true, maintainAspectRatio:false,
-        plugins:{ legend:{position:'bottom', labels:{boxWidth:12, font:{size:10}}} },
-        scales:{ y:{grid:{color:'#e3dfd5'}, title:{display:true, text:'Қызмет саны', font:{size:10}}}, x:{grid:{display:false}}}
-      }
-    });
-  }
-
-  // Әр учаске үшін мини-карточка
-  grid.innerHTML = uchKeys.map(k => {
-    const u = DATA.uch[k];
-    const w = u.weekly.slice(-4); // соңғы 4 апта
-    if (w.length === 0) return '';
-
-    const last = w[w.length - 1];
-    const prev = w.length > 1 ? w[w.length - 2] : null;
-    const avg = w.reduce((s, x) => s + x.records, 0) / w.length;
-    const trend = prev ? ((last.records - prev.records) / prev.records * 100) : 0;
-
-    let status, statusCls;
-    if (last.records < avg * 0.7) { status = 'Қызыл'; statusCls = 'danger'; }
-    else if (last.records < avg * 0.9) { status = 'Сары'; statusCls = 'warn'; }
-    else { status = 'Жасыл'; statusCls = 'ok'; }
-
-    const trendIcon = trend > 5 ? '📈' : (trend < -5 ? '📉' : '➡️');
-    const trendStr = trend > 0 ? `+${trend.toFixed(1)}%` : `${trend.toFixed(1)}%`;
-
-    return `
-      <div class="monitor-card">
-        <div class="monitor-title">
-          <strong>${k}-учаске</strong>
-          <span class="monitor-status ${statusCls}">${status}</span>
-        </div>
-        <div class="monitor-body">
-          Соңғы апта (${last.week}): <strong>${last.records} қызмет</strong>, ${last.patients} пациент<br>
-          Алдыңғы апта: ${prev ? prev.records + ' қызмет' : '—'} ${prev ? trendIcon + ' ' + trendStr : ''}<br>
-          Орт. (4 апта): <strong>${Math.round(avg)} қызмет/апта</strong><br>
-          КПН тиімділігі: <strong>${u.kpn_performance}%</strong>
-        </div>
-        <div class="mini-chart"><canvas id="miniChart_${k}"></canvas></div>
-      </div>
-    `;
-  }).join('');
-
-  // Мини-графиктер салу
-  uchKeys.forEach(k => {
-    const ctx = document.getElementById(`miniChart_${k}`);
-    if (!ctx) return;
-    const w = DATA.uch[k].weekly.slice(-8);
-    new Chart(ctx, {
-      type:'line',
-      data:{
-        labels: w.map(x => x.week),
-        datasets:[{
-          data: w.map(x => x.records),
-          borderColor:'#2d5e3e',
-          backgroundColor:'rgba(45,94,62,.15)',
-          tension:.3, fill:true, borderWidth:1.5, pointRadius:2,
-        }]
-      },
-      options:{
-        responsive:true, maintainAspectRatio:false,
-        plugins:{ legend:{display:false}, tooltip:{callbacks:{label:c=>c.parsed.y+' қызмет'}}},
-        scales:{ y:{display:false}, x:{display:false}}
-      }
-    });
-  });
-}
-
-// === ЗАҢНАМА ===
-function renderLaws() {
-  const laws = [
-    {num:'ҚР Кодексі №360-VI', date:'07.07.2020', name:'Халық денсаулығы және денсаулық сақтау жүйесі туралы', desc:'Жоғары заңдық күші бар құжат. ҚР-ның бүкіл денсаулық сақтау саласын реттейді.', status:'active'},
-    {num:'ҚР ДСМ-37', date:'27.04.2022', name:'Амбулаторлық жағдайдағы маманданған медициналық көмек көрсету ережелері', desc:'2026 ж 1 қаңтарынан жаңа редакцияда күшіне енген (№130 бұйрық, 03.11.2025). Сыртқы бағыттар, КДК, оңалту реттеледі.', status:'updated'},
-    {num:'ҚР ДСМ-90', date:'24.08.2021', name:'БМСК (бастапқы медициналық-санитарлық көмек) ережелері', desc:'БМСК қызметтерінің тізбесі, дәрігерлер жұмысының тәртібі.', status:'active'},
-    {num:'ҚР ДСМ-242/2020', date:'08.12.2020', name:'Сатып алу қағидалары', desc:'Шарт жасасу, бекіту, орындау тәртібі. Біздің шарт осы бұйрық негізінде.', status:'active'},
-    {num:'ҚР ДСМ-291/2020', date:'20.12.2020', name:'Қызметтерге ақы төлеу қағидалары', desc:'Аванс ұстау, акт жасау, төлемдерді есептеу. 3-қосымша осы бұйрық бойынша.', status:'active'},
-    {num:'ҚР ДСМ-309/2020', date:'21.12.2020', name:'Тарифтерді қалыптастыру', desc:'КПН тарифін есептеу формуласы. Жыныс-жас, плотность, отопит. коэффициенттері.', status:'active'},
-    {num:'ҚР ДСМ-321/2020', date:'24.12.2020', name:'Мониторинг қағидалары', desc:'ЕТЖ-ға деректерді жіберу, статус, қателер реттеледі.', status:'active'},
-    {num:'ҚР ДСМ-278/2020', date:'15.12.2020', name:'СКПН (стимулдеуші компонент)', desc:'14 индикатор бойынша қызметкерлерді ынталандыру. Соңғы көрсеткіштерге байланысты.', status:'active'},
-    {num:'ҚР Заңы №94-V', date:'21.05.2013', name:'Дербес деректер және оларды қорғау туралы', desc:'Пациенттер деректерін қорғау ережелері. Біздің порталда барлық дерек маскаланған.', status:'active'},
-  ];
-
-  document.getElementById('lawsList').innerHTML = laws.map(l => `
-    <div class="law-item">
-      <div class="law-num">${l.num} · ${l.date}</div>
-      <div class="law-name">${l.name}</div>
-      <div class="law-desc">${l.desc}</div>
-      <span class="law-status ${l.status}">${l.status === 'updated' ? '🔄 Жаңартылды (01.01.2026)' : '✓ Қолданыста'}</span>
-    </div>
-  `).join('');
-}
-
-function initSalaryCalc() {
-  const posSel = document.getElementById('empPosition');
-  const expSel = document.getElementById('empExperience');
-  const stavkiInp = document.getElementById('empStavki');
-  const skpnInp = document.getElementById('empSkpn');
-  const statusSel = document.getElementById('empStatus');
-  const secondPosSel = document.getElementById('empSecondPos');
-  const doplatyGroup = document.getElementById('doplatyGroup');
-  const resultEl = document.getElementById('salaryResult');
-
-  if (!posSel) return;
-
-  const S = DATA.salary;
-
-  // Лауазымдарды толтыру
-  function fillPosOptgroup(groupId, list) {
-    const group = document.getElementById(groupId);
-    list.forEach(p => {
-      const opt = document.createElement('option');
-      opt.value = `${p.code}|${p.coef}|${p.class}`;
-      opt.textContent = p.name_ru + ' / ' + p.name;
-      group.appendChild(opt);
-    });
-  }
-  fillPosOptgroup('grpDoctors', S.positions.doctors);
-  fillPosOptgroup('grpMid', S.positions.mid_medical);
-  fillPosOptgroup('grpJunior', S.positions.junior_medical);
-  fillPosOptgroup('grpAdmin', S.positions.admin);
-
-  // Қосымша лауазым (қоса атқару)
-  const allPositions = [...S.positions.doctors, ...S.positions.mid_medical, ...S.positions.junior_medical, ...S.positions.admin];
-  allPositions.forEach(p => {
-    const opt = document.createElement('option');
-    opt.value = `${p.code}|${p.coef}|${p.class}`;
-    opt.textContent = p.name_ru + ' / ' + p.name;
-    secondPosSel.appendChild(opt);
-  });
-
-  // Тәжірибе
-  S.experience.forEach(e => {
-    const opt = document.createElement('option');
-    opt.value = e.coef;
-    opt.textContent = `${e.label_kz} / ${e.label} (коэф ${e.coef})`;
-    expSel.appendChild(opt);
-  });
-  expSel.selectedIndex = 0;
-
-  // Қосымша төлемдер
-  doplatyGroup.innerHTML = S.doplaty.map(d => `
-    <label class="doplata-pill" data-key="${d.key}">
-      <input type="checkbox" value="${d.key}">
-      <span>${d.name_kz}</span>
-      <span class="pill-pct">+${d.pct}% ${d.base==='BDO'?'БДО':(d.base==='DO'?'ДО':'инд')}</span>
-    </label>
-  `).join('');
-
-  document.querySelectorAll('.doplata-pill').forEach(p => {
-    p.addEventListener('click', (ev) => {
-      ev.preventDefault();
-      const inp = p.querySelector('input');
-      inp.checked = !inp.checked;
-      p.classList.toggle('active', inp.checked);
-      recalc();
-    });
-  });
-
-  const empBonusSel = document.getElementById('empBonus');
-  const empUchastokSel = document.getElementById('empUchastok');
-  [posSel, expSel, stavkiInp, skpnInp, statusSel, secondPosSel, empBonusSel, empUchastokSel].forEach(el => {
+  function setValue(id, value) {
+    const el = document.getElementById(id);
     if (el) {
-      el.addEventListener('input', recalc);
-      el.addEventListener('change', recalc);
+      // Сандық анимация
+      animateNumber(el, parseInt(value) || 0);
     }
-  });
-
-  function calculatePayroll(gross, hasStdVychet, isDisabled, isPensioner) {
-    const C = S.constants;
-    const MRP = C.mrp_2026;
-    const MZP = C.mzp_2026;
-
-    // ҚЫЗМЕТКЕР ҰСТАМАЛАРЫ
-    const opvBase = Math.min(gross, MZP * 50);
-    const opv = (isDisabled || isPensioner) ? 0 : opvBase * 0.10;
-
-    const vosmsBase = Math.min(gross, MZP * 20);
-    const vosms = (isDisabled || isPensioner) ? 0 : vosmsBase * 0.02;
-
-    const stdVychet = hasStdVychet ? MRP * 30 : 0;
-    const ipnBase = Math.max(0, gross - opv - vosms - stdVychet);
-    const ipn = ipnBase * 0.10;
-
-    const totalEmployee = opv + vosms + ipn;
-    const net = gross - totalEmployee;
-
-    // ЖҰМЫС БЕРУШІ
-    const oosmsBase = Math.min(gross, MZP * 40);
-    const oosms = isPensioner ? 0 : oosmsBase * 0.03;
-
-    let soBase = gross - opv;
-    soBase = Math.max(MZP * 1, Math.min(MZP * 7, soBase));
-    const so = isPensioner ? 0 : soBase * 0.05;
-
-    const snBase = Math.max(MZP * 1, gross - opv - vosms);
-    const sn = snBase * 0.06;
-    const snToPay = Math.max(0, sn - so);
-
-    const opvrBase = Math.min(gross, MZP * 50);
-    const opvr = opvrBase * 0.035;
-
-    const totalEmployer = oosms + so + snToPay + opvr;
-
-    return {
-      gross, opv, vosms, ipn, ipnBase, stdVychet, totalEmployee, net,
-      oosms, so, sn, snToPay, opvr, totalEmployer,
-      fundTotal: gross + totalEmployer
-    };
   }
 
-  function recalc() {
-    if (!posSel.value || !expSel.value) {
-      resultEl.style.display = 'none';
-      return;
+  function animateNumber(el, target) {
+    const duration = 800;
+    const start = 0;
+    const startTime = performance.now();
+    function step(now) {
+      const progress = Math.min((now - startTime) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      el.textContent = Math.round(start + (target - start) * eased);
+      if (progress < 1) requestAnimationFrame(step);
     }
-
-    const [posCode, posCoef, posClass] = posSel.value.split('|');
-    const expCoef = parseFloat(expSel.value);
-    const stavki = parseFloat(stavkiInp.value) || 1;
-    const skpn = parseFloat(skpnInp.value) || 0;
-    const status = statusSel.value;
-    const C = S.constants;
-
-    // Лауазым атауы
-    const allPos = [...S.positions.doctors, ...S.positions.mid_medical, ...S.positions.junior_medical, ...S.positions.admin];
-    const pos = allPos.find(p => p.code === posCode);
-
-    // Мед түзету
-    const correction = (posClass === 'doctor') ? C.med_correction_high : C.med_correction_mid;
-
-    // ДО есеп
-    // Тарификация формуласы: ДО = БДО × жалпы_коэф × мед_түзету × ставка
-    // Жалпы коэф = лауазым_коэф (стаж бойынша). Эргашева мысалында 5.11 — бұл стаж 9-11 жыл коэфтының өзі
-    // Демек, posCoef — нақты сан тарификациядан, ал стаж — бөлек
-    // Бірақ дұрысы: ДО = БДО × категория_коэф × мед_түзету × ставка
-    // Тарификацияда «жалпы коэф» — бұл категория мен стаждың үйлесуі
-    // Қарапайымдылық үшін: ДО = БДО × posCoef × correction × stavki
-    // (Posкoef-те стаж аумағы есептелген — кейіннен экспирокоэф қосуға болады)
-
-    const do_base = C.bdo * parseFloat(posCoef) * correction * stavki;
-
-    // Қосымшалар
-    const checked = {};
-    document.querySelectorAll('.doplata-pill input:checked').forEach(c => checked[c.value] = true);
-
-    const items = [];
-    items.push({
-      label: 'Должностной оклад (ДО)',
-      desc: `БДО ${C.bdo} × ${posCoef} × ${correction} × ${stavki}`,
-      value: do_base,
-      type: 'base'
-    });
-
-    let totalDoplata = 0;
-    S.doplaty.forEach(d => {
-      if (!checked[d.key]) return;
-      let v = 0;
-      if (d.base === 'BDO') v = C.bdo * (d.pct / 100) * stavki;
-      else if (d.base === 'DO') v = do_base * (d.pct / 100);
-      else v = 0;
-      if (v > 0) {
-        items.push({ label: d.name_kz, desc: d.law, value: v, type: 'doplata' });
-        totalDoplata += v;
-      }
-    });
-
-    // Қоса атқару
-    if (secondPosSel.value) {
-      const [, secCoef, secClass] = secondPosSel.value.split('|');
-      const secCorr = (secClass === 'doctor') ? C.med_correction_high : C.med_correction_mid;
-      const secDo = C.bdo * parseFloat(secCoef) * secCorr * 0.5; // 0.5 ставка қоса атқару
-      items.push({ label: 'Қосымша лауазым (50% базасы)', desc: 'ҚР Еңбек кодексінің 111-бабы', value: secDo, type: 'doplata' });
-      totalDoplata += secDo;
-    }
-
-    if (skpn > 0) {
-      const uch = document.getElementById('empUchastok').value;
-      const skpnDesc = uch ? `ҚР ДСМ-278/2020 · ${uch}-учаске КПН ${DATA.uch[uch].kpn_performance}%` : 'ҚР ДСМ-278/2020';
-      items.push({ label: 'СКПН — Стимулдеуші компонент', desc: skpnDesc, value: skpn, type: 'doplata' });
-      totalDoplata += skpn;
-    }
-
-    // Бонус/премия
-    const bonusPct = parseFloat(document.getElementById('empBonus').value) || 0;
-    if (bonusPct > 0) {
-      const bonusValue = C.bdo * (bonusPct / 100) * stavki;
-      const bonusLabel = {
-        50: '🥇 Топ дәрігер/мейіргер бонусы',
-        30: '🥈 Жоғары сапа бонусы',
-        15: '🥉 Жақсы көрсеткіш бонусы',
-        100: '⭐ Жыл соңы сыйлығы'
-      }[bonusPct] || `Бонус (+${bonusPct}% БДО)`;
-      items.push({
-        label: bonusLabel,
-        desc: `БДО ${C.bdo} × ${bonusPct}% × ${stavki} ставка · сапалы жұмыс үшін`,
-        value: bonusValue,
-        type: 'bonus'
-      });
-      totalDoplata += bonusValue;
-    }
-
-    const gross = do_base + totalDoplata;
-
-    // Салықтар
-    const hasStdVychet = (status !== 'pensioner'); // зейнеткерде басқа шегерім (бұл жерде жеңілдетеміз)
-    const isDisabled = (status === 'disabled');
-    const isPensioner = (status === 'pensioner');
-    const tax = calculatePayroll(gross, hasStdVychet, isDisabled, isPensioner);
-
-    // НӘТИЖЕНІ КӨРСЕТУ
-    const posLabel = pos.name_ru + ' / ' + pos.name;
-    const expLabel = S.experience.find(e => e.coef === expCoef);
-
-    let html_ = `
-      <div class="sal-header">
-        <div class="sal-header-info">
-          <div class="sal-header-title">Айлық жалақы есебі</div>
-          <div class="sal-header-sub">${posLabel} · ${expLabel ? expLabel.label_kz : ''} · ${stavki} ставка</div>
-        </div>
-        <button class="sal-pdf-btn" onclick="exportSalaryPDF()">📄 PDF жүктеу</button>
-      </div>
-
-      <div class="sal-section">
-        <div class="sal-section-title">1️⃣ Жалақы құрамы</div>
-    `;
-    items.forEach(it => {
-      html_ += `<div class="sal-line"><span class="label">${it.label}<span class="desc">${it.desc}</span></span><span class="value">${fmtNum(it.value, 0)} тг</span></div>`;
-    });
-    html_ += `<div class="sal-line subtotal"><span class="label">БРУТТО (барлық есептелді)</span><span class="value">${fmtNum(gross, 0)} тг</span></div>`;
-    html_ += `</div>`;
-
-    html_ += `
-      <div class="sal-section">
-        <div class="sal-section-title">2️⃣ Қызметкерден ұсталатындар</div>
-        <div class="sal-line minus"><span class="label">ОПВ — Зейнетақы аударымы (10%)<span class="desc">База: ${fmtNum(Math.min(gross, C.mzp_2026*50), 0)} тг (макс 50 МЗП)</span></span><span class="value">−${fmtNum(tax.opv, 0)} тг</span></div>
-        <div class="sal-line minus"><span class="label">ВОСМС — МӘМС жарнасы (2%)<span class="desc">База: ${fmtNum(Math.min(gross, C.mzp_2026*20), 0)} тг (макс 20 МЗП)</span></span><span class="value">−${fmtNum(tax.vosms, 0)} тг</span></div>
-        <div class="sal-line"><span class="label">Стандартты шегерім<span class="desc">30 МРП × 4325 = 129 750 тг (ИПН азайту үшін)</span></span><span class="value">${fmtNum(tax.stdVychet, 0)} тг</span></div>
-        <div class="sal-line minus"><span class="label">ИПН — Жеке табыс салығы (10%)<span class="desc">База: ${fmtNum(tax.ipnBase, 0)} = брутто − ОПВ − ВОСМС − 30 МРП</span></span><span class="value">−${fmtNum(tax.ipn, 0)} тг</span></div>
-        <div class="sal-line subtotal minus"><span class="label">Барлық ұстау</span><span class="value">−${fmtNum(tax.totalEmployee, 0)} тг</span></div>
-      </div>
-
-      <div class="sal-final">
-        <div class="sal-final-label">💰 Қолға алатын таза сома</div>
-        <div class="sal-final-value">${fmtNum(tax.net, 0)} тг</div>
-        <div class="sal-final-extra">Брутто: ${fmtNum(gross, 0)} тг − Ұстау: ${fmtNum(tax.totalEmployee, 0)} тг (${(tax.totalEmployee/gross*100).toFixed(1)}%)</div>
-      </div>
-
-      <div class="sal-employer-box">
-        <div class="sal-section-title">3️⃣ Жұмыс беруші өз есебінен төлейді (қызметкер кірісіне әсер етпейді)</div>
-        <div class="sal-line plus"><span class="label">ООСМС — МӘМС аударымы (3%)<span class="desc">Жұмыс беруші, ӘМСҚ-ға</span></span><span class="value">+${fmtNum(tax.oosms, 0)} тг</span></div>
-        <div class="sal-line plus"><span class="label">СО — Әлеуметтік аударымдар (5%)<span class="desc">Шектер: 1 МЗП − 7 МЗП</span></span><span class="value">+${fmtNum(tax.so, 0)} тг</span></div>
-        <div class="sal-line plus"><span class="label">СН — Әлеуметтік салық (6% − СО)<span class="desc">Жалпы СН: ${fmtNum(tax.sn, 0)} тг, бюджетке: ${fmtNum(tax.snToPay, 0)} тг</span></span><span class="value">+${fmtNum(tax.snToPay, 0)} тг</span></div>
-        <div class="sal-line plus"><span class="label">ОПВР — Жұмыс беруші зейнетақы аударымы (3.5%)<span class="desc">2026 ж бастап</span></span><span class="value">+${fmtNum(tax.opvr, 0)} тг</span></div>
-        <div class="sal-line subtotal plus"><span class="label">Жұмыс беруші қосымша</span><span class="value">+${fmtNum(tax.totalEmployer, 0)} тг</span></div>
-        <div class="sal-line subtotal" style="border-top:2px solid var(--accent); padding-top:12px; margin-top:8px; font-size:14px;"><span class="label"><strong>💼 ҚОР ЖАЛПЫ ШЫҒЫНЫ</strong></span><span class="value" style="color:var(--accent); font-size:16px;"><strong>${fmtNum(tax.fundTotal, 0)} тг</strong></span></div>
-      </div>
-    `;
-
-    resultEl.innerHTML = html_;
-    resultEl.style.display = 'block';
-
-    // PDF үшін деректерді сақтаймыз
-    window._lastSalaryCalc = {
-      position: posLabel,
-      experience: expLabel ? expLabel.label_kz : '',
-      stavki, items, gross, tax, status,
-      checkedDoplaty: Object.keys(checked).map(k => S.doplaty.find(d => d.key === k)).filter(Boolean),
-      timestamp: new Date().toLocaleString('ru-RU')
-    };
-  }
-}
-
-// СКПН — учаске КПН тиімділігіне сай авто-есеп
-function autoCalcSkpn() {
-  const uchSel = document.getElementById('empUchastok');
-  const skpnInp = document.getElementById('empSkpn');
-  const stavkiInp = document.getElementById('empStavki');
-  const posSel = document.getElementById('empPosition');
-
-  if (!uchSel.value) {
-    alert('Алдымен учаскені таңдаңыз!');
-    return;
-  }
-  if (!posSel.value) {
-    alert('Лауазымды таңдаңыз!');
-    return;
+    requestAnimationFrame(step);
   }
 
-  const uch = DATA.uch[uchSel.value];
-  if (!uch) return;
-
-  const stavki = parseFloat(stavkiInp.value) || 1;
-  const [, , posClass] = posSel.value.split('|');
-
-  // СКПН формуласы (ҚР ДСМ-278/2020 негізінде):
-  // Базалық СКПН: дәрігерге БДО × 4, мейіргерге БДО × 2 = ~70 800 / 35 400
-  // Сапа коэффициенті:
-  //   - КПН тиімділігі (max 1.5)
-  //   - Қателер (бос диагноз, қайталану) - max 1.0
-  //   - Z-кодты диагноз (60% норма)
-  // СКПН = база × ставка × КПН_коэф × сапа_коэф
-
-  const C = DATA.salary.constants;
-  const baseSkpn = (posClass === 'doctor' ? C.bdo * 4 : C.bdo * 2); // дәрігерге 70 788 / мейіргерге 35 394
-
-  // КПН коэф: 50% болса 0.5, 100% болса 1.0, 130%-ке дейін 1.3
-  let kpnCoef = Math.min(1.5, uch.kpn_performance / 100);
-
-  // Сапа коэф (қателер мен Z-код ескере отырып)
-  let qualityCoef = 1.0;
-  const errorPct = (uch.duplicates + uch.empty_diag) / uch.records;
-  if (errorPct > 0.05) qualityCoef -= 0.2;
-  else if (errorPct > 0.03) qualityCoef -= 0.1;
-
-  if (uch.z_diag_pct > 70) qualityCoef -= 0.15;
-  else if (uch.z_diag_pct > 60) qualityCoef -= 0.05;
-
-  qualityCoef = Math.max(0.5, qualityCoef);
-
-  const skpn = Math.round(baseSkpn * stavki * kpnCoef * qualityCoef);
-  skpnInp.value = skpn;
-
-  // Толық түсіндірме
-  alert(
-    `СКПН авто-есеп (${uchSel.value}-учаске):\n\n` +
-    `Базалық: ${baseSkpn.toLocaleString('ru-RU')} тг\n` +
-    `× КПН тиімділігі ${uch.kpn_performance}%: ×${kpnCoef.toFixed(2)}\n` +
-    `× Сапа коэф (қателер ${(errorPct*100).toFixed(1)}%, Z-код ${uch.z_diag_pct}%): ×${qualityCoef.toFixed(2)}\n` +
-    `× Ставка: ×${stavki}\n\n` +
-    `= ${skpn.toLocaleString('ru-RU')} тг`
-  );
-
-  // Recalc автоматты
-  skpnInp.dispatchEvent(new Event('input'));
-}
-
-// PDF экспорт — pdfMake арқылы (кириллицамен жұмыс істейді)
-function exportSalaryPDF() {
-  if (!window._lastSalaryCalc) return;
-  const d = window._lastSalaryCalc;
-
-  // pdfMake мазмұны
-  const itemsRows = d.items.map(it => [
-    { text: it.label + '\n', style: 'cellLabel', stack: [
-      { text: it.label, fontSize: 10 },
-      { text: it.desc, fontSize: 8, color: '#888', italics: true }
-    ]},
-    { text: fmtNum(it.value) + ' тг', style: 'cellNum', alignment: 'right' }
-  ]);
-
-  const dd = {
-    pageSize: 'A4',
-    pageMargins: [40, 50, 40, 50],
-    info: {
-      title: 'Айлық жалақы есебі',
-      author: '«Аян» ЕСО',
-      subject: d.position,
-    },
-    content: [
-      { text: '«Аян» ЕСО — Айлық жалақы есебі', style: 'header' },
-      {
-        text: [
-          { text: 'Лауазым: ', bold: true }, d.position, '\n',
-          { text: 'Тәжірибе: ', bold: true }, d.experience, '   ',
-          { text: 'Ставка: ', bold: true }, String(d.stavki), '\n',
-          { text: 'Жасалған күні: ', bold: true }, d.timestamp,
-        ],
-        style: 'meta',
-        margin: [0, 0, 0, 12],
-      },
-
-      { text: '1. Жалақы құрамы', style: 'sectionTitle' },
-      {
-        table: {
-          widths: ['*', 110],
-          body: [
-            ...itemsRows,
-            [
-              { text: 'БРУТТО (барлық есептелді)', bold: true, fillColor: '#f0f5ec' },
-              { text: fmtNum(d.gross) + ' тг', bold: true, alignment: 'right', fillColor: '#f0f5ec' }
-            ],
-          ],
-        },
-        layout: {
-          hLineWidth: () => 0.5,
-          vLineWidth: () => 0,
-          hLineColor: () => '#ddd',
-        }
-      },
-
-      { text: '2. Қызметкерден ұсталатындар (2026 ж салық кодексі)', style: 'sectionTitle', margin: [0, 14, 0, 6] },
-      {
-        table: {
-          widths: ['*', 110],
-          body: [
-            [
-              { text: 'ОПВ — Зейнетақы аударымы (10%)' },
-              { text: '−' + fmtNum(d.tax.opv) + ' тг', alignment: 'right', color: '#b8392c' }
-            ],
-            [
-              { text: 'ВОСМС — МӘМС жарнасы (2%)' },
-              { text: '−' + fmtNum(d.tax.vosms) + ' тг', alignment: 'right', color: '#b8392c' }
-            ],
-            [
-              { stack: [
-                { text: 'ИПН — Жеке табыс салығы (10%)' },
-                { text: 'База: ' + fmtNum(d.tax.ipnBase) + ' тг (брутто − ОПВ − ВОСМС − 30 МРП)', fontSize: 8, color: '#888', italics: true }
-              ]},
-              { text: '−' + fmtNum(d.tax.ipn) + ' тг', alignment: 'right', color: '#b8392c' }
-            ],
-            [
-              { text: 'Стандартты шегерім (30 МРП = 129 750 тг)', italics: true, color: '#666' },
-              { text: fmtNum(d.tax.stdVychet) + ' тг', alignment: 'right', italics: true, color: '#666' }
-            ],
-            [
-              { text: 'Барлық ұстау', bold: true, fillColor: '#fdf0ee' },
-              { text: '−' + fmtNum(d.tax.totalEmployee) + ' тг', bold: true, alignment: 'right', color: '#b8392c', fillColor: '#fdf0ee' }
-            ],
-          ],
-        },
-        layout: {
-          hLineWidth: () => 0.5,
-          vLineWidth: () => 0,
-          hLineColor: () => '#ddd',
-        }
-      },
-
-      // ҚОЛҒА — үлкен блок
-      {
-        margin: [0, 16, 0, 16],
-        table: {
-          widths: ['*'],
-          body: [[
-            {
-              fillColor: '#e8f0e2',
-              stack: [
-                { text: '💰 ҚОЛҒА АЛАТЫН ТАЗА СОМА', alignment: 'center', fontSize: 10, color: '#4a4d48', margin: [0, 6, 0, 4] },
-                { text: fmtNum(d.tax.net) + ' тг', alignment: 'center', fontSize: 28, bold: true, color: '#2d5e3e' },
-                { text: 'Жалпы ұстау: ' + (d.tax.totalEmployee/d.gross*100).toFixed(1) + '% брутто-дан', alignment: 'center', fontSize: 9, color: '#666', margin: [0, 4, 0, 6] }
-              ]
-            }
-          ]],
-        },
-        layout: { hLineWidth: () => 0, vLineWidth: () => 0 }
-      },
-
-      { text: '3. Жұмыс беруші өз есебінен төлейді (ақпарат үшін)', style: 'sectionTitle', margin: [0, 8, 0, 6] },
-      {
-        table: {
-          widths: ['*', 110],
-          body: [
-            [{ text: 'ООСМС — МӘМС аударымы (3%)' }, { text: '+' + fmtNum(d.tax.oosms) + ' тг', alignment: 'right', color: '#2d5e3e' }],
-            [{ text: 'СО — Әлеуметтік аударымдар (5%)' }, { text: '+' + fmtNum(d.tax.so) + ' тг', alignment: 'right', color: '#2d5e3e' }],
-            [{ text: 'СН — Әлеуметтік салық (6% − СО)' }, { text: '+' + fmtNum(d.tax.snToPay) + ' тг', alignment: 'right', color: '#2d5e3e' }],
-            [{ text: 'ОПВР — Жұмыс беруші зейнетақы (3.5%)' }, { text: '+' + fmtNum(d.tax.opvr) + ' тг', alignment: 'right', color: '#2d5e3e' }],
-            [
-              { text: 'Жұмыс беруші қосымша', bold: true, fillColor: '#f0f5ec' },
-              { text: '+' + fmtNum(d.tax.totalEmployer) + ' тг', bold: true, alignment: 'right', color: '#2d5e3e', fillColor: '#f0f5ec' }
-            ],
-            [
-              { text: '💼 ҚОР ЖАЛПЫ ШЫҒЫНЫ', bold: true, fillColor: '#e8f0e2', fontSize: 11 },
-              { text: fmtNum(d.tax.fundTotal) + ' тг', bold: true, alignment: 'right', color: '#2d5e3e', fillColor: '#e8f0e2', fontSize: 13 }
-            ],
-          ],
-        },
-        layout: {
-          hLineWidth: () => 0.5,
-          vLineWidth: () => 0,
-          hLineColor: () => '#ddd',
-        }
-      },
-
-      // Заңнамалық негіз
-      {
-        margin: [0, 16, 0, 0],
-        table: {
-          widths: ['*'],
-          body: [[{
-            fillColor: '#fbf9f4',
-            stack: [
-              { text: 'Заңнамалық негіздер (2026 ж):', bold: true, fontSize: 9, color: '#2d5e3e', margin: [0, 4, 0, 4] },
-              { text: '• ҚР Үкіметінің №1193 қаулысы (31.12.2015, өзг. №70 — 03.02.2026)', fontSize: 8 },
-              { text: '• №1002 қаулысы (15.11.2023) — мед. түзету коэф (3.42 / 2.34)', fontSize: 8 },
-              { text: '• ҚР Салық кодексі (01.01.2026 ж жаңа редакция)', fontSize: 8 },
-              { text: '• Заң №239-VIII (08.12.2025) — Республикалық бюджет 2026: МРП = 4 325 тг, МЗП = 85 000 тг', fontSize: 8 },
-              { text: '• БДО = 17 697 тг (ПП №1193, 1-тармақ)', fontSize: 8, margin: [0, 0, 0, 4] },
-            ],
-          }]],
-        },
-        layout: { hLineWidth: () => 0, vLineWidth: () => 0 }
-      },
-
-      // Ескерту
-      { text: '\nБұл есеп ДО + барлық қосымшалар + СКПН негізінде есептелген. Нақты айлық тарификациялық комиссия шешімі бойынша түзетілуі мүмкін.', fontSize: 8, italics: true, color: '#888', alignment: 'center', margin: [0, 12, 0, 0] },
-      { text: '«Аян» ЕСО · Конфиденциалды құжат', fontSize: 8, color: '#888', alignment: 'center', margin: [0, 4, 0, 0] },
-    ],
-    styles: {
-      header: { fontSize: 16, bold: true, color: '#2d5e3e', margin: [0, 0, 0, 4] },
-      meta: { fontSize: 10, color: '#4a4d48' },
-      sectionTitle: { fontSize: 12, bold: true, color: '#2d5e3e', margin: [0, 8, 0, 6] },
-      cellLabel: { fontSize: 10 },
-      cellNum: { fontSize: 10 },
-    },
-    defaultStyle: {
-      font: 'Roboto',
-      fontSize: 10,
-    }
-  };
-
-  const fileName = `Айлық_есеп_${d.position.replace(/[^а-яА-ЯёЁa-zA-Z0-9]/g, '_').slice(0, 30)}_${new Date().toISOString().slice(0,10)}.pdf`;
-  pdfMake.createPdf(dd).download(fileName);
-}
-
-// ============================================================
-// 🗺 ХАЛЫҚ САНАҒЫ — Apps Script API байланысы
-// ============================================================
-let censusMap = null;
-let censusMarkers = [];
-let censusData = { houses: [], patients: [], visits: [] };
-
-// Учаске түстері (картадағы маркерлер үшін)
-const UCH_COLORS = {
-  1: '#2d5e3e', // жасыл
-  2: '#3b82f6', // көк
-  3: '#eab308', // сары
-  4: '#ef4444', // қызыл
-  5: '#a855f7', // күлгін
-  6: '#f97316', // қызғылт
-  7: '#1f2937', // қара
-};
-
-// API URL-ды localStorage-да сақтаймыз
-function censusGetApiUrl() {
-  return localStorage.getItem('ayan_api_url') || '';
-}
-
-function censusGetTgId() {
-  return localStorage.getItem('ayan_tg_id') || '751358211';
-}
-
-// Бастапқы — сақталған мәндерді input-ке қою
-function censusInitInputs() {
-  const urlInp = document.getElementById('censusApiUrl');
-  const tgInp = document.getElementById('censusTgId');
-  if (urlInp) urlInp.value = censusGetApiUrl();
-  if (tgInp) tgInp.value = censusGetTgId();
-}
-
-// API call
-async function censusApiCall(action, params = {}) {
-  const url = document.getElementById('censusApiUrl').value.trim();
-  const tgId = document.getElementById('censusTgId').value.trim();
-  
-  if (!url) {
-    alert('Apps Script URL-ды енгізіңіз!');
-    return null;
-  }
-  
-  const payload = {
-    action,
-    auth: { telegram_id: tgId },
-    ...params,
-  };
-  
-  try {
-    const resp = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain' }, // CORS-ты айналып өту
-      body: JSON.stringify(payload),
-      redirect: 'follow',
-    });
-    return await resp.json();
-  } catch (e) {
-    console.error('API қатесі:', e);
-    return { ok: false, error: e.message };
-  }
-}
-
-// Қосылу
-async function censusConnect() {
-  const url = document.getElementById('censusApiUrl').value.trim();
-  const tgId = document.getElementById('censusTgId').value.trim();
-  
-  if (!url || !tgId) {
-    alert('URL мен Telegram ID-ді енгізіңіз');
-    return;
-  }
-  
-  localStorage.setItem('ayan_api_url', url);
-  localStorage.setItem('ayan_tg_id', tgId);
-  
-  const status = document.getElementById('censusStatus');
-  status.textContent = '⏳ Қосылып жатырмыз...';
-  status.style.color = 'var(--ink-3)';
-  
-  // Ping тексеру
-  const ping = await censusApiCall('ping');
-  if (!ping || !ping.ok) {
-    status.textContent = '❌ Қосылу мүмкін емес';
-    status.style.color = 'var(--danger)';
-    alert('API-ге қосылу мүмкін емес. URL мен Deploy параметрлерін тексеріңіз.');
-    return;
-  }
-  
-  status.textContent = '✅ Қосылған';
-  status.style.color = 'var(--accent)';
-  
-  // Деректерді жүктеу
-  await censusRefresh();
-}
-
-// Деректерді жаңарту
-async function censusRefresh() {
-  const status = document.getElementById('censusStatus');
-  status.textContent = '⏳ Деректер жүктеліп жатыр...';
-  
-  // 3 параллельді сұраныс
-  const [housesRes, patientsRes, visitsRes] = await Promise.all([
-    censusApiCall('house.list', { filter: {} }),
-    censusApiCall('patient.list', { filter: {} }),
-    censusApiCall('visit.list', { filter: {} }),
-  ]);
-  
-  if (!housesRes || !housesRes.ok) {
-    status.textContent = '❌ Деректер алу мүмкін емес';
-    status.style.color = 'var(--danger)';
-    alert('Қате: ' + (housesRes?.error || 'Белгісіз қате'));
-    return;
-  }
-  
-  censusData.houses = housesRes.data || [];
-  censusData.patients = patientsRes?.data || [];
-  censusData.visits = visitsRes?.data || [];
-  
-  status.textContent = `✅ ${censusData.houses.length} үй, ${censusData.patients.length} пациент, ${censusData.visits.length} аралау`;
-  status.style.color = 'var(--accent)';
-  
-  document.getElementById('censusRefreshBtn').style.display = 'inline-block';
-  
-  if (censusData.houses.length === 0 && censusData.patients.length === 0) {
-    document.getElementById('censusContent').style.display = 'none';
-    document.getElementById('censusEmpty').style.display = 'block';
-    return;
-  }
-  
-  document.getElementById('censusContent').style.display = 'block';
-  document.getElementById('censusEmpty').style.display = 'none';
-  
-  // KPI жаңарту
-  renderCensusKPI();
-  // Учаске кестесі
-  renderCensusUchTable();
-  // Карта жаңарту
-  renderCensusMap();
-  // Кестелер
-  renderHousesTable();
-  renderPatientsTable();
-  renderVisitsTable();
-}
-
-function renderCensusKPI() {
-  const h = censusData.houses;
-  const p = censusData.patients;
-  const v = censusData.visits;
-  
-  document.getElementById('kpiHouses').textContent = h.length;
-  
-  const withGps = h.filter(x => x.latitude && x.longitude).length;
-  document.getElementById('kpiHousesGps').textContent = `GPS-пен: ${withGps}`;
-  
-  document.getElementById('kpiPatients').textContent = p.length;
-  const attached = p.filter(x => x.attachment_status === 'бекітілген').length;
-  document.getElementById('kpiPatientsAttached').textContent = `Бекітілген: ${attached}`;
-  
-  document.getElementById('kpiVisits').textContent = v.length;
-  
-  const today = new Date().toISOString().slice(0, 10);
-  const todayVisits = v.filter(x => String(x.visit_date || '').slice(0, 10) === today).length;
-  document.getElementById('kpiVisitsToday').textContent = `Бүгін: ${todayVisits}`;
-  
-  const highRisk = p.filter(x => x.risk_level === 'жоғары').length;
-  document.getElementById('kpiRiskHigh').textContent = highRisk;
-  
-  const overdue = p.filter(x => x.next_visit_date && new Date(x.next_visit_date) < new Date()).length;
-  document.getElementById('kpiOverdue').textContent = `Мерзімі өткен: ${overdue}`;
-}
-
-function renderCensusUchTable() {
-  const cont = document.getElementById('censusUchTable');
-  const stats = {};
-  for (let u = 1; u <= 7; u++) {
-    stats[u] = { houses: 0, gps: 0, patients: 0, visits: 0, attached: 0, highRisk: 0 };
-  }
-  
-  censusData.houses.forEach(h => {
-    const u = h.uchastok;
-    if (stats[u]) {
-      stats[u].houses++;
-      if (h.latitude && h.longitude) stats[u].gps++;
-    }
-  });
-  
-  censusData.patients.forEach(p => {
-    const u = p.uchastok;
-    if (stats[u]) {
-      stats[u].patients++;
-      if (p.attachment_status === 'бекітілген') stats[u].attached++;
-      if (p.risk_level === 'жоғары') stats[u].highRisk++;
-    }
-  });
-  
-  censusData.visits.forEach(v => {
-    const house = censusData.houses.find(h => h.id == v.house_id);
-    if (house && stats[house.uchastok]) stats[house.uchastok].visits++;
-  });
-  
-  let html = '<table style="width:100%; border-collapse:collapse; font-family:-apple-system,sans-serif; font-size:13px;">';
-  html += '<thead><tr style="background:var(--bg-card-2); border-bottom:2px solid var(--line);">';
-  html += '<th style="padding:8px; text-align:left;">Учаске</th>';
-  html += '<th style="padding:8px; text-align:right;">🏠 Үйлер</th>';
-  html += '<th style="padding:8px; text-align:right;">📍 GPS</th>';
-  html += '<th style="padding:8px; text-align:right;">👥 Пациенттер</th>';
-  html += '<th style="padding:8px; text-align:right;">✅ Бекітілген</th>';
-  html += '<th style="padding:8px; text-align:right;">⚠️ Жоғары қауіп</th>';
-  html += '<th style="padding:8px; text-align:right;">🚪 Аралаулар</th>';
-  html += '</tr></thead><tbody>';
-  
-  for (let u = 1; u <= 7; u++) {
-    const s = stats[u];
-    const gpsPct = s.houses > 0 ? Math.round(s.gps / s.houses * 100) : 0;
-    html += `<tr style="border-bottom:1px solid var(--line);">`;
-    html += `<td style="padding:8px;"><span style="display:inline-block; width:12px; height:12px; border-radius:50%; background:${UCH_COLORS[u]}; margin-right:6px;"></span><b>${u}-учаске</b></td>`;
-    html += `<td style="padding:8px; text-align:right; font-variant-numeric: tabular-nums;">${s.houses}</td>`;
-    html += `<td style="padding:8px; text-align:right; font-variant-numeric: tabular-nums; color:${gpsPct >= 80 ? 'var(--accent)' : gpsPct >= 50 ? 'var(--warn)' : 'var(--danger)'};">${s.gps} (${gpsPct}%)</td>`;
-    html += `<td style="padding:8px; text-align:right; font-variant-numeric: tabular-nums;">${s.patients}</td>`;
-    html += `<td style="padding:8px; text-align:right; font-variant-numeric: tabular-nums;">${s.attached}</td>`;
-    html += `<td style="padding:8px; text-align:right; font-variant-numeric: tabular-nums; color:${s.highRisk > 0 ? 'var(--danger)' : 'var(--ink-3)'};">${s.highRisk}</td>`;
-    html += `<td style="padding:8px; text-align:right; font-variant-numeric: tabular-nums;">${s.visits}</td>`;
-    html += '</tr>';
-  }
-  html += '</tbody></table>';
-  cont.innerHTML = html;
-}
-
-function renderCensusMap() {
-  const houses = censusData.houses.filter(h => h.latitude && h.longitude);
-  
-  // Карта орталығы — Сарыағаш
-  const center = houses.length > 0 
-    ? [parseFloat(houses[0].latitude), parseFloat(houses[0].longitude)]
-    : [41.4623, 69.1234]; // Сарыағаш үшін default
-  
-  if (!censusMap) {
-    censusMap = L.map('censusMap').setView(center, 14);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution: '© OpenStreetMap'
-    }).addTo(censusMap);
-  } else {
-    // Ескі маркерлерді жоямыз
-    censusMarkers.forEach(m => censusMap.removeLayer(m));
-    censusMarkers = [];
-    censusMap.setView(center, 14);
-  }
-  
-  if (houses.length === 0) {
-    return;
-  }
-  
-  // Маркерлер
-  houses.forEach(h => {
-    const lat = parseFloat(h.latitude);
-    const lng = parseFloat(h.longitude);
-    if (isNaN(lat) || isNaN(lng)) return;
-    
-    const color = UCH_COLORS[h.uchastok] || '#666';
-    
-    // Үйдегі пациенттер
-    const housePatients = censusData.patients.filter(p => p.house_id == h.id);
-    
-    const icon = L.divIcon({
-      className: 'census-marker',
-      html: `<div style="width:24px; height:24px; background:${color}; border:3px solid white; border-radius:50%; box-shadow:0 2px 6px rgba(0,0,0,.3); display:flex; align-items:center; justify-content:center; color:#fff; font-size:11px; font-weight:bold;">${h.uchastok}</div>`,
-      iconSize: [24, 24],
-      iconAnchor: [12, 12]
-    });
-    
-    const marker = L.marker([lat, lng], { icon }).addTo(censusMap);
-    
-    let popup = `<div style="font-family:Georgia,serif; min-width:200px;">`;
-    popup += `<div style="font-weight:bold; color:${color}; margin-bottom:4px;">🏠 ${h.street}, ${h.house_number}${h.apartment ? ', пәт.' + h.apartment : ''}</div>`;
-    popup += `<div style="font-size:12px; color:#666; font-family:-apple-system,sans-serif;">${h.uchastok}-учаске · ${h.family_count || 1} жанұя</div>`;
-    
-    if (housePatients.length > 0) {
-      popup += `<div style="margin-top:8px; padding-top:6px; border-top:1px solid #eee; font-size:12px; font-family:-apple-system,sans-serif;">`;
-      popup += `<b>👥 Пациенттер (${housePatients.length}):</b><br>`;
-      housePatients.slice(0, 5).forEach(p => {
-        popup += `&nbsp;• ${p.full_name}`;
-        if (p.risk_level === 'жоғары') popup += ` ⚠️`;
-        popup += `<br>`;
-      });
-      if (housePatients.length > 5) {
-        popup += `&nbsp;...тағы ${housePatients.length - 5}<br>`;
-      }
-      popup += `</div>`;
-    }
-    
-    if (h.notes) {
-      popup += `<div style="margin-top:6px; padding-top:6px; border-top:1px solid #eee; font-size:11px; color:#888; font-family:-apple-system,sans-serif;">📝 ${h.notes}</div>`;
-    }
-    
-    popup += `</div>`;
-    marker.bindPopup(popup);
-    censusMarkers.push(marker);
-  });
-  
-  // Барлық маркерлерді карта аумағына сыйдыру
-  if (censusMarkers.length > 1) {
-    const group = L.featureGroup(censusMarkers);
-    censusMap.fitBounds(group.getBounds().pad(0.2));
-  }
-}
-
-function renderHousesTable() {
-  const cont = document.getElementById('housesTable');
-  const filter = document.getElementById('houseFilter').value.toLowerCase().trim();
-  const uchFilter = document.getElementById('houseUchFilter').value;
-  
-  let houses = [...censusData.houses];
-  if (filter) {
-    houses = houses.filter(h => 
-      String(h.street || '').toLowerCase().includes(filter) ||
-      String(h.house_number || '').toLowerCase().includes(filter)
-    );
-  }
-  if (uchFilter) {
-    houses = houses.filter(h => String(h.uchastok) === uchFilter);
-  }
-  
-  if (houses.length === 0) {
-    cont.innerHTML = '<div style="text-align:center; padding:20px; color:var(--ink-3); font-family:-apple-system,sans-serif; font-size:13px;">Үй табылмады</div>';
-    return;
-  }
-  
-  let html = '<table style="width:100%; border-collapse:collapse; font-family:-apple-system,sans-serif; font-size:13px;">';
-  html += '<thead><tr style="background:var(--bg-card-2); border-bottom:2px solid var(--line);">';
-  html += '<th style="padding:8px; text-align:left;">ID</th>';
-  html += '<th style="padding:8px; text-align:left;">Учаске</th>';
-  html += '<th style="padding:8px; text-align:left;">Мекен-жай</th>';
-  html += '<th style="padding:8px; text-align:right;">Жанұя</th>';
-  html += '<th style="padding:8px; text-align:center;">📍 GPS</th>';
-  html += '<th style="padding:8px; text-align:left;">Ескертулер</th>';
-  html += '</tr></thead><tbody>';
-  
-  houses.forEach(h => {
-    const apt = h.apartment ? `, пәт.${h.apartment}` : '';
-    const hasGps = h.latitude && h.longitude;
-    html += `<tr style="border-bottom:1px solid var(--line);">`;
-    html += `<td style="padding:8px;">${h.id}</td>`;
-    html += `<td style="padding:8px;"><span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:${UCH_COLORS[h.uchastok]}; margin-right:4px;"></span>${h.uchastok}</td>`;
-    html += `<td style="padding:8px;">${h.street || ''}, ${h.house_number || ''}${apt}</td>`;
-    html += `<td style="padding:8px; text-align:right;">${h.family_count || 0}</td>`;
-    html += `<td style="padding:8px; text-align:center;">${hasGps ? '✅' : '❌'}</td>`;
-    html += `<td style="padding:8px; color:var(--ink-3); font-size:11px;">${h.notes || '—'}</td>`;
-    html += '</tr>';
-  });
-  html += '</tbody></table>';
-  cont.innerHTML = html;
-}
-
-function renderPatientsTable() {
-  const cont = document.getElementById('patientsTable');
-  const filter = document.getElementById('patientFilter').value.toLowerCase().trim();
-  const riskFilter = document.getElementById('patientRiskFilter').value;
-  const uchFilter = document.getElementById('patientUchFilter').value;
-  
-  let patients = [...censusData.patients];
-  if (filter) {
-    patients = patients.filter(p => 
-      String(p.full_name || '').toLowerCase().includes(filter) ||
-      String(p.iin || '').includes(filter)
-    );
-  }
-  if (riskFilter) {
-    patients = patients.filter(p => p.risk_level === riskFilter);
-  }
-  if (uchFilter) {
-    patients = patients.filter(p => String(p.uchastok) === uchFilter);
-  }
-  
-  if (patients.length === 0) {
-    cont.innerHTML = '<div style="text-align:center; padding:20px; color:var(--ink-3); font-family:-apple-system,sans-serif; font-size:13px;">Пациент табылмады</div>';
-    return;
-  }
-  
-  let html = '<table style="width:100%; border-collapse:collapse; font-family:-apple-system,sans-serif; font-size:13px;">';
-  html += '<thead><tr style="background:var(--bg-card-2); border-bottom:2px solid var(--line);">';
-  html += '<th style="padding:8px; text-align:left;">ID</th>';
-  html += '<th style="padding:8px; text-align:left;">Аты-жөні</th>';
-  html += '<th style="padding:8px; text-align:left;">ЖСН</th>';
-  html += '<th style="padding:8px; text-align:left;">Туған күні</th>';
-  html += '<th style="padding:8px; text-align:center;">Учаске</th>';
-  html += '<th style="padding:8px; text-align:left;">Диагноз</th>';
-  html += '<th style="padding:8px; text-align:center;">Қауіп</th>';
-  html += '<th style="padding:8px; text-align:left;">Соңғы тексеру</th>';
-  html += '</tr></thead><tbody>';
-  
-  const riskBadge = {
-    'жоғары': '<span style="color:var(--danger);">⚠️ Жоғары</span>',
-    'орташа': '<span style="color:var(--warn);">🟡 Орташа</span>',
-    'төмен': '<span style="color:var(--accent);">🟢 Төмен</span>',
-  };
-  
-  patients.forEach(p => {
-    const maskedIin = p.iin ? p.iin.slice(0, 6) + '*****' + p.iin.slice(11) : '—';
-    html += `<tr style="border-bottom:1px solid var(--line);">`;
-    html += `<td style="padding:8px;">${p.id}</td>`;
-    html += `<td style="padding:8px;"><b>${p.full_name || '—'}</b></td>`;
-    html += `<td style="padding:8px; font-family:monospace; font-size:11px;">${maskedIin}</td>`;
-    html += `<td style="padding:8px;">${String(p.birth_date || '').slice(0, 10)}</td>`;
-    html += `<td style="padding:8px; text-align:center;">${p.uchastok || '—'}</td>`;
-    html += `<td style="padding:8px; font-size:11px;">${p.main_diagnosis || '—'}</td>`;
-    html += `<td style="padding:8px; text-align:center;">${riskBadge[p.risk_level] || '—'}</td>`;
-    html += `<td style="padding:8px; font-size:11px;">${String(p.last_visit_date || '—').slice(0, 10)}</td>`;
-    html += '</tr>';
-  });
-  html += '</tbody></table>';
-  cont.innerHTML = html;
-}
-
-function renderVisitsTable() {
-  const cont = document.getElementById('visitsTable');
-  const typeFilter = document.getElementById('visitTypeFilter').value;
-  
-  let visits = [...censusData.visits];
-  if (typeFilter) {
-    visits = visits.filter(v => v.visit_type === typeFilter);
-  }
-  
-  // Соңғылар бірінші
-  visits.sort((a, b) => new Date(b.visit_date) - new Date(a.visit_date));
-  
-  if (visits.length === 0) {
-    cont.innerHTML = '<div style="text-align:center; padding:20px; color:var(--ink-3); font-family:-apple-system,sans-serif; font-size:13px;">Аралау жоқ</div>';
-    return;
-  }
-  
-  let html = '<table style="width:100%; border-collapse:collapse; font-family:-apple-system,sans-serif; font-size:13px;">';
-  html += '<thead><tr style="background:var(--bg-card-2); border-bottom:2px solid var(--line);">';
-  html += '<th style="padding:8px; text-align:left;">Күн</th>';
-  html += '<th style="padding:8px; text-align:left;">Түрі</th>';
-  html += '<th style="padding:8px; text-align:left;">Үй</th>';
-  html += '<th style="padding:8px; text-align:left;">Пациент</th>';
-  html += '<th style="padding:8px; text-align:left;">Мейіргер</th>';
-  html += '<th style="padding:8px; text-align:left;">Көрсетулер</th>';
-  html += '<th style="padding:8px; text-align:right;">Уақыт</th>';
-  html += '<th style="padding:8px; text-align:center;">📸</th>';
-  html += '</tr></thead><tbody>';
-  
-  const typeIcons = {
-    'профилактика': '🛡',
-    'диспансер': '📋',
-    'патронаж': '👶',
-    'жедел': '🚨',
-  };
-  
-  visits.slice(0, 100).forEach(v => {
-    const date = String(v.visit_date || '').slice(0, 16).replace('T', ' ');
-    const house = censusData.houses.find(h => h.id == v.house_id);
-    const patient = censusData.patients.find(p => p.id == v.patient_id);
-    const houseText = house ? `${house.street}, ${house.house_number}` : `#${v.house_id}`;
-    const patientText = patient ? patient.full_name : (v.patient_id ? `#${v.patient_id}` : '—');
-    
-    let meas = '—';
+  function formatTime(isoString) {
     try {
-      const m = typeof v.measurements === 'string' ? JSON.parse(v.measurements) : v.measurements;
-      if (m && typeof m === 'object') {
-        meas = Object.entries(m).map(([k, val]) => `${k}=${val}`).join(', ');
-      }
-    } catch (e) {}
-    
-    let photoCount = 0;
-    try {
-      const photos = typeof v.photo_url === 'string' ? JSON.parse(v.photo_url) : v.photo_url;
-      if (Array.isArray(photos)) photoCount = photos.length;
-    } catch (e) {}
-    
-    html += `<tr style="border-bottom:1px solid var(--line);">`;
-    html += `<td style="padding:8px; font-size:11px;">${date}</td>`;
-    html += `<td style="padding:8px;">${typeIcons[v.visit_type] || ''} ${v.visit_type || '—'}</td>`;
-    html += `<td style="padding:8px; font-size:11px;">${houseText}</td>`;
-    html += `<td style="padding:8px;">${patientText}</td>`;
-    html += `<td style="padding:8px; font-size:11px;">${v.nurse_name || '—'}</td>`;
-    html += `<td style="padding:8px; font-size:11px; color:var(--ink-2);">${meas}</td>`;
-    html += `<td style="padding:8px; text-align:right;">${v.duration_minutes || 0} мин</td>`;
-    html += `<td style="padding:8px; text-align:center;">${photoCount > 0 ? '📸 ' + photoCount : '—'}</td>`;
-    html += '</tr>';
-  });
-  html += '</tbody></table>';
-  
-  if (visits.length > 100) {
-    html += `<div style="text-align:center; margin-top:10px; font-size:12px; color:var(--ink-3); font-family:-apple-system,sans-serif;">Алғашқы 100 жазба көрсетілді (${visits.length} жалпы)</div>`;
+      const d = new Date(isoString);
+      const kz = new Date(d.getTime() + 6 * 60 * 60 * 1000);
+      const pad = (n) => String(n).padStart(2, "0");
+      return pad(kz.getUTCDate()) + "." + pad(kz.getUTCMonth() + 1) + "." +
+             kz.getUTCFullYear() + " " + pad(kz.getUTCHours()) + ":" + pad(kz.getUTCMinutes());
+    } catch (e) {
+      return "—";
+    }
   }
-  
-  cont.innerHTML = html;
-}
 
-// Census қойындылар
-document.addEventListener('DOMContentLoaded', function() {
-  // Бастапқы input-тарды толтыру
-  censusInitInputs();
-  
-  // Tabs
-  document.querySelectorAll('.census-tab').forEach(t => {
-    t.addEventListener('click', function() {
-      document.querySelectorAll('.census-tab').forEach(x => {
-        x.classList.remove('active');
-        x.style.background = 'var(--bg-card-2)';
-        x.style.color = 'var(--ink-2)';
-      });
-      this.classList.add('active');
-      this.style.background = 'var(--accent)';
-      this.style.color = '#fff';
-      
-      const target = this.dataset.csec;
-      document.querySelectorAll('.census-section').forEach(s => {
-        s.style.display = 'none';
-        s.classList.remove('active');
-      });
-      const sec = document.getElementById('csec-' + target);
-      if (sec) {
-        sec.style.display = 'block';
-        sec.classList.add('active');
-        
-        // Карта табын ашқанда — өлшемді жаңарту
-        if (target === 'map' && censusMap) {
-          setTimeout(() => censusMap.invalidateSize(), 100);
-        }
-      }
-    });
-  });
-  
-  // Фильтрлер
-  ['houseFilter', 'houseUchFilter'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.addEventListener('input', renderHousesTable);
-  });
-  ['patientFilter', 'patientRiskFilter', 'patientUchFilter'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.addEventListener('input', renderPatientsTable);
-  });
-  const vt = document.getElementById('visitTypeFilter');
-  if (vt) vt.addEventListener('change', renderVisitsTable);
-});
+  async function loadStats() {
+    const btn = document.getElementById("refresh-btn");
+    if (btn) btn.classList.add("spinning");
 
+    // Loading күйі (тек алғашқы рет)
+    if (document.getElementById("content").classList.contains("hidden")) {
+      show("loading");
+    }
+    hide("error");
+
+    try {
+      const response = await fetch(API_URL + "?endpoint=dashboard_stats");
+      if (!response.ok) throw new Error("HTTP " + response.status);
+
+      const result = await response.json();
+
+      if (!result.ok) throw new Error(result.error || "Белгісіз қате");
+
+      const d = result.data;
+
+      setValue("total_patients", d.total_patients);
+      setValue("total_houses", d.total_houses);
+      setValue("total_nurses", d.total_nurses);
+      setValue("patients_overdue", d.patients_overdue);
+      setValue("patients_high_risk", d.patients_high_risk);
+      setValue("patients_no_visit_30days", d.patients_no_visit_30days);
+      setValue("patients_with_next_visit", d.patients_with_next_visit);
+      setValue("patients_new_recent", d.patients_new_recent);
+      setValue("today_visits_count", d.today_visits_count);
+
+      document.getElementById("updated-time").textContent = formatTime(result.generated_at);
+
+      hide("loading");
+      show("content");
+
+    } catch (e) {
+      hide("loading");
+      document.getElementById("error-msg").textContent = "Қате: " + e.message;
+      show("error");
+    } finally {
+      if (btn) btn.classList.remove("spinning");
+    }
+  }
+
+  // Алғашқы жүктеу
+  loadStats();
 </script>
 </body>
 </html>
