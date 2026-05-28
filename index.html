@@ -201,6 +201,49 @@
 
   .hidden { display: none !important; }
 
+  /* Activity feed */
+  .activity-feed {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 32px;
+  }
+  .activity-item {
+    background: linear-gradient(160deg, var(--card), var(--bg-soft));
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 12px;
+    padding: 14px 18px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    opacity: 0;
+    transform: translateX(-10px);
+    animation: slidein 0.4s ease forwards;
+  }
+  .activity-time {
+    font-family: 'Spectral', serif;
+    font-weight: 700;
+    color: var(--accent);
+    font-size: 15px;
+    white-space: nowrap;
+    min-width: 64px;
+  }
+  .activity-time .date { display: block; font-size: 11px; color: var(--text-dim); font-weight: 500; }
+  .activity-body { flex: 1; }
+  .activity-main { font-size: 14px; font-weight: 600; }
+  .activity-main .arrow { color: var(--text-dim); margin: 0 6px; }
+  .activity-sub { font-size: 12px; color: var(--text-dim); margin-top: 3px; }
+  .activity-empty {
+    text-align: center;
+    color: var(--text-dim);
+    padding: 30px;
+    font-size: 14px;
+  }
+  @keyframes slidein {
+    to { opacity: 1; transform: translateX(0); }
+  }
+
   /* Footer */
   .footer {
     text-align: center;
@@ -317,6 +360,11 @@
       </div>
     </div>
 
+    <div class="section-label">Соңғы белсенділік (24 сағат)</div>
+    <div id="activity-feed" class="activity-feed">
+      <div class="activity-empty">Жүктелуде...</div>
+    </div>
+
     <div class="actions">
       <button class="btn" id="refresh-btn" onclick="loadStats()">
         <span class="btn-icon">🔄</span> Жаңарту
@@ -370,6 +418,49 @@
     }
   }
 
+  async function loadActivity() {
+    const feed = document.getElementById("activity-feed");
+    try {
+      const response = await fetch(API_URL + "?endpoint=recent_activity");
+      if (!response.ok) throw new Error("HTTP " + response.status);
+      const result = await response.json();
+      if (!result.ok) throw new Error(result.error || "қате");
+
+      const activities = result.data.activities || [];
+
+      if (activities.length === 0) {
+        feed.innerHTML = '<div class="activity-empty">Соңғы 24 сағатта аралау жоқ</div>';
+        return;
+      }
+
+      let html = "";
+      activities.forEach(function(a, idx) {
+        const delay = (idx * 0.05).toFixed(2);
+        html += '<div class="activity-item" style="animation-delay:' + delay + 's">' +
+          '<div class="activity-time">' + escapeHtml(a.time_str) +
+          '<span class="date">' + escapeHtml(a.date_str) + '</span></div>' +
+          '<div class="activity-body">' +
+          '<div class="activity-main">' + escapeHtml(a.nurse_name) +
+          '<span class="arrow">→</span>' + escapeHtml(a.patient_name) + '</div>' +
+          '<div class="activity-sub">🏠 ' + escapeHtml(a.house) +
+          ' · ' + escapeHtml(a.visit_type) + '</div>' +
+          '</div></div>';
+      });
+      feed.innerHTML = html;
+
+    } catch (e) {
+      feed.innerHTML = '<div class="activity-empty">Белсенділік жүктелмеді</div>';
+    }
+  }
+
+  function escapeHtml(s) {
+    if (s == null) return "";
+    return String(s)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+  }
+
   async function loadStats() {
     const btn = document.getElementById("refresh-btn");
     if (btn) btn.classList.add("spinning");
@@ -404,6 +495,9 @@
 
       hide("loading");
       show("content");
+
+      // Activity feed-ті бөлек жүктеу (блоктамайды)
+      loadActivity();
 
     } catch (e) {
       hide("loading");
